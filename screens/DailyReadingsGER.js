@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { StyleSheet, View, Text, TouchableOpacity, StatusBar, Image, ImageBackground, LayoutAnimation, Platform, UIManager, TextInput, BackHandler, Alert, LogBox } from 'react-native'
+import { StyleSheet, View, Text, TouchableOpacity, StatusBar, Image, ImageBackground, LayoutAnimation, Platform, UIManager, TextInput, BackHandler, Alert, LogBox, ActivityIndicator } from 'react-native'
 import { ScrollView } from 'react-native-gesture-handler';
 import DateTimePickerModal from 'react-native-modal-datetime-picker';
 import Realm from 'realm';
@@ -7,6 +7,7 @@ import moment from 'moment'
 import NetInfo from "@react-native-community/netinfo";
 import Toast from 'react-native-simple-toast';
 import AsyncStorage from '@react-native-community/async-storage';
+var currentWeekNumber = require('current-week-number');
 
 
 const DOWN_ARROW = require('../assets/down_arrow.png');
@@ -32,8 +33,11 @@ export default class DailyReadingsGER extends React.Component {
             expandedG3: false,
             expandedG4: false,
             expandedG5: false,
+            isLoading: false,
+
             onClickName: '',
             expand: false,
+            currentDate: '',
             //GENERIC VARIABLES
             dateYesterday: '',
             dayYesterday: '',
@@ -102,7 +106,7 @@ export default class DailyReadingsGER extends React.Component {
             g3Valve15DripMls: '',
             g3Valve16DripMls: '',
             g3Valve17DripMls: '',
-            g3Valve181DripMls: '',
+            g3Valve18DripMls: '',
             g3Valve19DripMls: '',
             g3Valve20DripMls: '',
             //
@@ -381,6 +385,26 @@ export default class DailyReadingsGER extends React.Component {
         this.setState({ dayYesterday: dayBasedOnDate })
         this.setItem('dateYesterday', moment(date).format('DD/MM/YYYY'))
         this.setItem('dayYesterday', dayBasedOnDate)
+
+        //GET DATA FROM REALM
+
+        /* console.log("DATE DEMO : "+this.state.dateYesterday - 1);
+         var dateDemo = this.state.dateYesterday - 1
+         var entry_details = realm
+             .objects('daily_readings_offline_table')
+             .filtered('dateYesterday =' + '03/03/2021');
+         console.log(entry_details);
+         if (entry_details.length > 0) {
+ 
+             console.log(entry_details[0]);
+ 
+         } else {
+ 
+             alert('No entry found');
+ 
+         }*/
+
+        //END
     }
 
     onPressCancel = () => {
@@ -433,6 +457,8 @@ export default class DailyReadingsGER extends React.Component {
         return true;
     }
 
+
+
     componentDidMount() {
 
         //CALLING GET ASYNC VALUES METHOD
@@ -441,10 +467,37 @@ export default class DailyReadingsGER extends React.Component {
 
         //
 
-        realm = new Realm({ path: 'DailyReadingsDB.realm' });
-        var daily_readings = realm.objects('daily_readings_offline_table');
-        this.setState({ FlatListItems: daily_readings})
-        console.log("DATA FROM REALM : " + this.state.FlatListItems);
+        //VIEW ALL USERS
+        /*var daily_readings = realm.objects('daily_readings_offline_table');
+        this.setState({ FlatListItems: daily_readings })
+        console.log("DATA FROM REALM : " + this.state.FlatListItems);*/
+
+        var currentDate1 = moment().format("DD/MM/YYYY");
+
+        this.setState({ currentDate: currentDate1 })
+
+        console.log("CURRENT WEEK NUMBER : " + currentDate1);
+
+        /*var daily_readings = realm
+            .objects('daily_readings_offline_table')
+            .filtered('dateYesterday =' + input_user_id);
+        console.log(user_details);
+        if (user_details.length > 0) {
+            console.log(user_details[0]);
+            this.setState({
+                userData: user_details[0],
+            });
+        } else {
+            alert('No user found');
+            this.setState({
+                userData: '',
+            });
+
+        }*/
+
+
+
+
 
 
 
@@ -454,23 +507,78 @@ export default class DailyReadingsGER extends React.Component {
 
     }
 
+    // INITIALIZING GET PROMISE OBJECT
+    getPromiseObject = (type, url, params, useCredentials) => {
+        return new Promise((resolve, reject) => {
+            this.XmlHttpRequest(type, url, params, useCredentials, resolve, reject);
+        });
+    };
+
+    XmlHttpRequest = (type, url, params, useCredentials, resolve, reject) => {
+        var json = JSON.stringify(params);
+        var xhr = new XMLHttpRequest();
+        xhr.open(type, url);
+        xhr.onload = function () {
+            resolve(xhr.responseText);
+        };
+        xhr.onerror = function () {
+            reject(xhr.statusText);
+        };
+        xhr.setRequestHeader('Content-type', 'application/json; charset=utf-8');
+        if (useCredentials) xhr.withCredentials = true;
+        xhr.send(json);
+    };
+    //END
+
     //METHOD FOR GETTING ASYNC VALUES
 
     getAsyncValues = () => {
 
         console.log("CALLING ASYNC VALUES...");
 
+
         try {
             AsyncStorage.getItem('dateYesterday').then((data1) => {
-                this.setState({ dateYesterday: JSON.parse(data1) });
-                console.log("DATE : " + this.state.dateYesterday);
+
+
+                if (data1 !== null) {
+
+                    this.setState({ dateYesterday: JSON.parse(data1) });
+                    console.log("DATE : " + this.state.dateYesterday);
+                    this.setState({ isLoading: true })
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+                }
+
+
+
+
             }).done();
         } catch (error) {
         }
 
+
         try {
             AsyncStorage.getItem('dayYesterday').then((data2) => {
-                this.setState({ dayYesterday: JSON.parse(data2) });
+
+                if (data2 !== null) {
+
+                    this.setState({ dayYesterday: JSON.parse(data2) });
+                    this.setState({ isLoading: true })
+
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
+
+
 
             }).done();
         } catch (error) {
@@ -478,7 +586,19 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('gas').then((data3) => {
-                this.setState({ gas: JSON.parse(data3) });
+
+                if (data3 !== null) {
+
+                    this.setState({ gas: JSON.parse(data3) });
+                    this.setState({ isLoading: true })
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -486,14 +606,40 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('liquidCO2').then((data4) => {
-                this.setState({ liquidCO2: JSON.parse(data4) });
+
+                if (data4 !== null) {
+
+                    this.setState({ liquidCO2: JSON.parse(data4) });
+                    this.setState({ isLoading: true })
+
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
         }
         try {
             AsyncStorage.getItem('drainDischarge').then((data5) => {
-                this.setState({ drainDischarge: JSON.parse(data5) });
+
+                if (data5 !== null) {
+
+                    this.setState({ drainDischarge: JSON.parse(data5) });
+                    this.setState({ isLoading: true })
+
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -502,7 +648,19 @@ export default class DailyReadingsGER extends React.Component {
         //G1 ASYNC getItem
         try {
             AsyncStorage.getItem('g1SouthDripMls').then((data6) => {
-                this.setState({ g1SouthDripMls: JSON.parse(data6) });
+
+                if (data6 !== null) {
+
+                    this.setState({ g1SouthDripMls: JSON.parse(data6) });
+                    this.setState({ isLoading: true })
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -510,7 +668,17 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1SouthDripEC').then((data7) => {
-                this.setState({ g1SouthDripEC: JSON.parse(data7) });
+
+                if (data7 !== null) {
+                    this.setState({ g1SouthDripEC: JSON.parse(data7) });
+                    this.setState({ isLoading: true })
+
+
+
+                } else[
+
+
+                ]
 
             }).done();
         } catch (error) {
@@ -518,7 +686,20 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1SouthDripPh').then((data8) => {
-                this.setState({ g1SouthDripPh: JSON.parse(data8) });
+
+                if (data8 !== null) {
+
+                    this.setState({ g1SouthDripPh: JSON.parse(data8) });
+                    this.setState({ isLoading: true })
+
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -526,7 +707,20 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1SouthDrainMls').then((data9) => {
-                this.setState({ g1SouthDrainMls: JSON.parse(data9) });
+
+                if (data9 !== null) {
+
+                    this.setState({ g1SouthDrainMls: JSON.parse(data9) });
+                    this.setState({ isLoading: true })
+
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -534,7 +728,20 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1SouthDrainEc').then((data10) => {
-                this.setState({ g1SouthDrainEc: JSON.parse(data10) });
+
+                if (data10 !== null) {
+
+                    this.setState({ g1SouthDrainEc: JSON.parse(data10) });
+                    this.setState({ isLoading: true })
+
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -543,7 +750,19 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1SouthDrainPh').then((data11) => {
-                this.setState({ g1SouthDrainPh: JSON.parse(data11) });
+                if (data11 !== null) {
+
+                    this.setState({ g1SouthDrainPh: JSON.parse(data11) });
+                    this.setState({ isLoading: true })
+
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -551,7 +770,20 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1NorthDripMls').then((data12) => {
-                this.setState({ g1NorthDripMls: JSON.parse(data12) });
+
+                if (data12 !== null) {
+
+                    this.setState({ g1NorthDripMls: JSON.parse(data12) });
+                    this.setState({ isLoading: true })
+
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -559,7 +791,20 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1NorthDripEC').then((data13) => {
-                this.setState({ g1NorthDripEC: JSON.parse(data13) });
+
+                if (data13 !== null) {
+
+                    this.setState({ g1NorthDripEC: JSON.parse(data13) });
+                    this.setState({ isLoading: true })
+
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -567,7 +812,17 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1NorthDripPh').then((data14) => {
-                this.setState({ g1NorthDripPh: JSON.parse(data14) });
+
+                if (data14 !== null) {
+
+                    this.setState({ g1NorthDripPh: JSON.parse(data14) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -575,7 +830,19 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1NorthDrainMls').then((data15) => {
-                this.setState({ g1NorthDrainMls: JSON.parse(data15) });
+
+                if (data15 !== null) {
+
+                    this.setState({ g1NorthDrainMls: JSON.parse(data15) });
+                    this.setState({ isLoading: true })
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -583,7 +850,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1NorthDrainEC').then((data16) => {
-                this.setState({ g1NorthDrainEC: JSON.parse(data16) });
+                if (data16 !== null) {
+                    this.setState({ g1NorthDrainEC: JSON.parse(data16) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -592,7 +867,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1NorthDrainPh').then((data17) => {
-                this.setState({ g1NorthDrainPh: JSON.parse(data17) });
+                if (data17 !== null) {
+                    this.setState({ g1NorthDrainPh: JSON.parse(data17) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -600,7 +883,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1Valve1DripMls').then((data18) => {
-                this.setState({ g1Valve1DripMls: JSON.parse(data18) });
+                if (data18 !== null) {
+                    this.setState({ g1Valve1DripMls: JSON.parse(data18) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -608,7 +899,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1Valve2DripMls').then((data19) => {
-                this.setState({ g1Valve2DripMls: JSON.parse(data19) });
+                if (data19 !== null) {
+                    this.setState({ g1Valve2DripMls: JSON.parse(data19) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -616,7 +915,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1Valve3DripMls').then((data20) => {
-                this.setState({ g1Valve3DripMls: JSON.parse(data20) });
+                if (data20 !== null) {
+                    this.setState({ g1Valve3DripMls: JSON.parse(data20) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -624,7 +931,17 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g1Valve4DripMls').then((data21) => {
-                this.setState({ g1Valve4DripMls: JSON.parse(data21) });
+                if (data21 !== null) {
+
+                    this.setState({ g1Valve4DripMls: JSON.parse(data21) });
+                    this.setState({ isLoading: true })
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -635,7 +952,15 @@ export default class DailyReadingsGER extends React.Component {
         //G2 ASYNC getItem
         try {
             AsyncStorage.getItem('g2SouthDripMls').then((data22) => {
-                this.setState({ g2SouthDripMls: JSON.parse(data22) });
+                if (data22 !== null) {
+                    this.setState({ g2SouthDripMls: JSON.parse(data22) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -643,7 +968,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2SouthDripEC').then((data23) => {
-                this.setState({ g2SouthDripEC: JSON.parse(data23) });
+                if (data23 !== null) {
+                    this.setState({ g2SouthDripEC: JSON.parse(data23) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -651,7 +984,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2SouthDripPh').then((data24) => {
-                this.setState({ g2SouthDripPh: JSON.parse(data24) });
+                if (data24 !== null) {
+                    this.setState({ g2SouthDripPh: JSON.parse(data24) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -659,7 +1000,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2SouthDrainMls').then((data25) => {
-                this.setState({ g2SouthDrainMls: JSON.parse(data25) });
+                if (data25 !== null) {
+                    this.setState({ g2SouthDrainMls: JSON.parse(data25) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -667,7 +1016,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2SouthDrainEc').then((data26) => {
-                this.setState({ g2SouthDrainEc: JSON.parse(data26) });
+                if (data26 !== null) {
+                    this.setState({ g2SouthDrainEc: JSON.parse(data26) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -676,7 +1033,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2SouthDrainPh').then((data27) => {
-                this.setState({ g2SouthDrainPh: JSON.parse(data27) });
+                if (data27 !== null) {
+                    this.setState({ g2SouthDrainPh: JSON.parse(data27) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -684,7 +1049,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2NorthDripMls').then((data28) => {
-                this.setState({ g2NorthDripMls: JSON.parse(data28) });
+                if (data28 !== null) {
+                    this.setState({ g2NorthDripMls: JSON.parse(data28) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -692,7 +1065,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2NorthDripEC').then((data29) => {
-                this.setState({ g2NorthDripEC: JSON.parse(data29) });
+                if (data29 !== null) {
+                    this.setState({ g2NorthDripEC: JSON.parse(data29) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -700,7 +1081,16 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2NorthDripPh').then((data30) => {
-                this.setState({ g2NorthDripPh: JSON.parse(data30) });
+                if (data30 !== null) {
+                    this.setState({ g2NorthDripPh: JSON.parse(data30) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
+
 
             }).done();
         } catch (error) {
@@ -708,7 +1098,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2NorthDrainMls').then((data31) => {
-                this.setState({ g2NorthDrainMls: JSON.parse(data31) });
+                if (data31 !== null) {
+                    this.setState({ g2NorthDrainMls: JSON.parse(data31) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -716,7 +1114,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2NorthDrainEC').then((data32) => {
-                this.setState({ g2NorthDrainEC: JSON.parse(data32) });
+                if (data32 !== null) {
+                    this.setState({ g2NorthDrainEC: JSON.parse(data32) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -725,7 +1131,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2NorthDrainPh').then((data33) => {
-                this.setState({ g2NorthDrainPh: JSON.parse(data33) });
+                if (data33 !== null) {
+                    this.setState({ g2NorthDrainPh: JSON.parse(data33) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -733,7 +1147,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2Valve5DripMls').then((data34) => {
-                this.setState({ g2Valve5DripMls: JSON.parse(data34) });
+                if (data34 !== null) {
+                    this.setState({ g2Valve5DripMls: JSON.parse(data34) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -741,7 +1163,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2Valve6DripMls').then((data35) => {
-                this.setState({ g2Valve6DripMls: JSON.parse(data35) });
+                if (data35 !== null) {
+                    this.setState({ g2Valve6DripMls: JSON.parse(data35) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -749,7 +1179,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2Valve7DripMls').then((data36) => {
-                this.setState({ g2Valve7DripMls: JSON.parse(data36) });
+                if (data36 !== null) {
+                    this.setState({ g2Valve7DripMls: JSON.parse(data36) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -757,7 +1195,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2Valve8DripMls').then((data37) => {
-                this.setState({ g2Valve8DripMls: JSON.parse(data37) });
+                if (data37 !== null) {
+                    this.setState({ g2Valve8DripMls: JSON.parse(data37) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -765,7 +1211,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2Valve9DripMls').then((data38) => {
-                this.setState({ g2Valve9DripMls: JSON.parse(data38) });
+                if (data38 !== null) {
+                    this.setState({ g2Valve9DripMls: JSON.parse(data38) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -773,7 +1227,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2Valve10DripMls').then((data39) => {
-                this.setState({ g2Valve10DripMls: JSON.parse(data39) });
+                if (data39 !== null) {
+                    this.setState({ g2Valve10DripMls: JSON.parse(data39) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -781,7 +1243,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2Valve11DripMls').then((data381) => {
-                this.setState({ g2Valve11DripMls: JSON.parse(data381) });
+                if (data381 !== null) {
+                    this.setState({ g2Valve11DripMls: JSON.parse(data381) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -789,7 +1259,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g2Valve12DripMls').then((data391) => {
-                this.setState({ g2Valve12DripMls: JSON.parse(data391) });
+                if (data391 !== null) {
+                    this.setState({ g2Valve12DripMls: JSON.parse(data391) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -799,7 +1277,15 @@ export default class DailyReadingsGER extends React.Component {
         //G3 ASYNC getItem
         try {
             AsyncStorage.getItem('g3SouthDripMls').then((data40) => {
-                this.setState({ g3SouthDripMls: JSON.parse(data40) });
+                if (data40 !== null) {
+                    this.setState({ g3SouthDripMls: JSON.parse(data40) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -807,7 +1293,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3SouthDripEC').then((data41) => {
-                this.setState({ g3SouthDripEC: JSON.parse(data41) });
+                if (data41 !== null) {
+                    this.setState({ g3SouthDripEC: JSON.parse(data41) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -815,7 +1309,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3SouthDripPh').then((data42) => {
-                this.setState({ g3SouthDripPh: JSON.parse(data42) });
+                if (data42 !== null) {
+                    this.setState({ g3SouthDripPh: JSON.parse(data42) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -823,7 +1325,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3SouthDrainMls').then((data43) => {
-                this.setState({ g3SouthDrainMls: JSON.parse(data43) });
+                if (data43 !== null) {
+                    this.setState({ g3SouthDrainMls: JSON.parse(data43) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -831,7 +1341,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3SouthDrainEc').then((data44) => {
-                this.setState({ g3SouthDrainEc: JSON.parse(data44) });
+                if (data44 !== null) {
+                    this.setState({ g3SouthDrainEc: JSON.parse(data44) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -840,7 +1358,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3SouthDrainPh').then((data45) => {
-                this.setState({ g3SouthDrainPh: JSON.parse(data45) });
+                if (data45 !== null) {
+                    this.setState({ g3SouthDrainPh: JSON.parse(data45) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -848,7 +1374,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3NorthDripMls').then((data46) => {
-                this.setState({ g3NorthDripMls: JSON.parse(data46) });
+                if (data46 !== null) {
+                    this.setState({ g3NorthDripMls: JSON.parse(data46) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -856,7 +1390,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3NorthDripEC').then((data47) => {
-                this.setState({ g3NorthDripEC: JSON.parse(data47) });
+                if (data47 !== null) {
+                    this.setState({ g3NorthDripEC: JSON.parse(data47) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -864,7 +1405,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3NorthDripPh').then((data48) => {
-                this.setState({ g3NorthDripPh: JSON.parse(data48) });
+                if (data48 !== null) {
+                    this.setState({ g3NorthDripPh: JSON.parse(data48) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -872,7 +1420,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3NorthDrainMls').then((data49) => {
-                this.setState({ g3NorthDrainMls: JSON.parse(data49) });
+                if (data49 !== null) {
+                    this.setState({ g3NorthDrainMls: JSON.parse(data49) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -880,7 +1435,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3NorthDrainEC').then((data50) => {
-                this.setState({ g3NorthDrainEC: JSON.parse(data50) });
+                if (data50 !== null) {
+                    this.setState({ g3NorthDrainEC: JSON.parse(data50) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -889,7 +1451,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3NorthDrainPh').then((data51) => {
-                this.setState({ g3NorthDrainPh: JSON.parse(data51) });
+                if (data51 !== null) {
+                    this.setState({ g3NorthDrainPh: JSON.parse(data51) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -897,7 +1466,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3Valve20DripMls').then((data52) => {
-                this.setState({ g3Valve20DripMls: JSON.parse(data52) });
+                if (data52 !== null) {
+                    this.setState({ g3Valve20DripMls: JSON.parse(data52) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -905,7 +1481,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3Valve13DripMls').then((data53) => {
-                this.setState({ g3Valve13DripMls: JSON.parse(data53) });
+                if (data53 !== null) {
+                    this.setState({ g3Valve13DripMls: JSON.parse(data53) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -913,7 +1496,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3Valve14DripMls').then((data54) => {
-                this.setState({ g3Valve14DripMls: JSON.parse(data54) });
+                if (data54 !== null) {
+                    this.setState({ g3Valve14DripMls: JSON.parse(data54) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -921,7 +1511,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3Valve15DripMls').then((data55) => {
-                this.setState({ g3Valve15DripMls: JSON.parse(data55) });
+                if (data55 !== null) {
+                    this.setState({ g3Valve15DripMls: JSON.parse(data55) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -929,7 +1526,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3Valve16DripMls').then((data56) => {
-                this.setState({ g3Valve16DripMls: JSON.parse(data56) });
+                if (data56 !== null) {
+                    this.setState({ g3Valve16DripMls: JSON.parse(data56) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -937,7 +1541,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3Valve17DripMls').then((data57) => {
-                this.setState({ g3Valve17DripMls: JSON.parse(data57) });
+                if (data57 !== null) {
+                    this.setState({ g3Valve17DripMls: JSON.parse(data57) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -945,7 +1556,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3Valve18DripMls').then((data58) => {
-                this.setState({ g3Valve18DripMls: JSON.parse(data58) });
+                if (data58 !== null) {
+                    this.setState({ g3Valve18DripMls: JSON.parse(data58) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -953,7 +1571,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g3Valve19DripMls').then((data59) => {
-                this.setState({ g3Valve19DripMls: JSON.parse(data59) });
+                if (data59 !== null) {
+                    this.setState({ g3Valve19DripMls: JSON.parse(data59) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -963,7 +1588,14 @@ export default class DailyReadingsGER extends React.Component {
         //G4 ASYNC getItem
         try {
             AsyncStorage.getItem('g4SouthDripMls').then((data60) => {
-                this.setState({ g4SouthDripMls: JSON.parse(data60) });
+                if (data60 !== null) {
+                    this.setState({ g4SouthDripMls: JSON.parse(data60) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -971,7 +1603,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4SouthDripEC').then((data61) => {
-                this.setState({ g4SouthDripEC: JSON.parse(data61) });
+                if (data61 !== null) {
+                    this.setState({ g4SouthDripEC: JSON.parse(data61) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -979,7 +1618,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4SouthDripPh').then((data62) => {
-                this.setState({ g4SouthDripPh: JSON.parse(data62) });
+                if (data62 !== null) {
+                    this.setState({ g4SouthDripPh: JSON.parse(data62) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -987,7 +1633,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4SouthDrainMls').then((data63) => {
-                this.setState({ g4SouthDrainMls: JSON.parse(data63) });
+                if (data63 !== null) {
+                    this.setState({ g4SouthDrainMls: JSON.parse(data63) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -995,7 +1648,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4SouthDrainEc').then((data64) => {
-                this.setState({ g4SouthDrainEc: JSON.parse(data64) });
+                if (data64 !== null) {
+                    this.setState({ g4SouthDrainEc: JSON.parse(data64) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1004,7 +1664,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4SouthDrainPh').then((data65) => {
-                this.setState({ g4SouthDrainPh: JSON.parse(data65) });
+                if (data65 !== null) {
+                    this.setState({ g4SouthDrainPh: JSON.parse(data65) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1012,7 +1679,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4NorthDripMls').then((data66) => {
-                this.setState({ g4NorthDripMls: JSON.parse(data66) });
+                if (data66 !== null) {
+                    this.setState({ g4NorthDripMls: JSON.parse(data66) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1020,7 +1694,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4NorthDripEC').then((data67) => {
-                this.setState({ g4NorthDripEC: JSON.parse(data67) });
+                if (data67 !== null) {
+                    this.setState({ g4NorthDripEC: JSON.parse(data67) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1028,7 +1709,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4NorthDripPh').then((data68) => {
-                this.setState({ g4NorthDripPh: JSON.parse(data68) });
+                if (data68 !== null) {
+                    this.setState({ g4NorthDripPh: JSON.parse(data68) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1036,7 +1724,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4NorthDrainMls').then((data69) => {
-                this.setState({ g4NorthDrainMls: JSON.parse(data69) });
+                if (data69 !== null) {
+                    this.setState({ g4NorthDrainMls: JSON.parse(data69) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1044,7 +1739,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4NorthDrainEC').then((data70) => {
-                this.setState({ g4NorthDrainEC: JSON.parse(data70) });
+                if (data70 !== null) {
+                    this.setState({ g4NorthDrainEC: JSON.parse(data70) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1053,7 +1755,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4NorthDrainPh').then((data71) => {
-                this.setState({ g4NorthDrainPh: JSON.parse(data71) });
+                if (data71 !== null) {
+                    this.setState({ g4NorthDrainPh: JSON.parse(data71) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1061,7 +1770,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4Valve21DripMls').then((data72) => {
-                this.setState({ g4Valve21DripMls: JSON.parse(data72) });
+                if (data72 !== null) {
+                    this.setState({ g4Valve21DripMls: JSON.parse(data72) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1069,7 +1785,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4Valve22DripMls').then((data73) => {
-                this.setState({ g4Valve22DripMls: JSON.parse(data73) });
+                if (data73 !== null) {
+                    this.setState({ g4Valve22DripMls: JSON.parse(data73) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1077,7 +1800,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4Valve23DripMls').then((data74) => {
-                this.setState({ g4Valve23DripMls: JSON.parse(data74) });
+                if (data74 !== null) {
+                    this.setState({ g4Valve23DripMls: JSON.parse(data74) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1085,7 +1815,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g4Valve24DripMls').then((data75) => {
-                this.setState({ g4Valve24DripMls: JSON.parse(data75) });
+                if (data75 !== null) {
+                    this.setState({ g4Valve24DripMls: JSON.parse(data75) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1096,7 +1833,14 @@ export default class DailyReadingsGER extends React.Component {
         //G5 ASYNC getItem
         try {
             AsyncStorage.getItem('g5FirstDripMls').then((data76) => {
-                this.setState({ g5FirstDripMls: JSON.parse(data76) });
+                if (data76 !== null) {
+                    this.setState({ g5FirstDripMls: JSON.parse(data76) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1104,7 +1848,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5FirstDripEC').then((data77) => {
-                this.setState({ g5FirstDripEC: JSON.parse(data77) });
+                if (data77 !== null) {
+                    this.setState({ g5FirstDripEC: JSON.parse(data77) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1112,7 +1863,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5FirstDripPh').then((data78) => {
-                this.setState({ g5FirstDripPh: JSON.parse(data78) });
+                if (data78 !== null) {
+                    this.setState({ g5FirstDripPh: JSON.parse(data78) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
+
 
             }).done();
         } catch (error) {
@@ -1120,7 +1879,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5FirstDrainMls').then((data79) => {
-                this.setState({ g5FirstDrainMls: JSON.parse(data79) });
+                if (data79 !== null) {
+                    this.setState({ g5FirstDrainMls: JSON.parse(data79) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1128,7 +1894,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5FirstDrainEc').then((data80) => {
-                this.setState({ g5FirstDrainEc: JSON.parse(data80) });
+                if (data80 !== null) {
+                    this.setState({ g5FirstDrainEc: JSON.parse(data80) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1137,7 +1910,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5FirstDrainPh').then((data81) => {
-                this.setState({ g5FirstDrainPh: JSON.parse(data81) });
+                if (data81 !== null) {
+                    this.setState({ g5FirstDrainPh: JSON.parse(data81) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1145,7 +1925,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5SecondDripMls').then((data82) => {
-                this.setState({ g5SecondDripMls: JSON.parse(data82) });
+                if (data82 !== null) {
+                    this.setState({ g5SecondDripMls: JSON.parse(data82) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1153,7 +1940,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5SecondDripEC').then((data83) => {
-                this.setState({ g5SecondDripEC: JSON.parse(data83) });
+                if (data83 !== null) {
+                    this.setState({ g5SecondDripEC: JSON.parse(data83) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1161,7 +1955,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5SecondDripPh').then((data84) => {
-                this.setState({ g5SecondDripPh: JSON.parse(data84) });
+                if (data84 !== null) {
+                    this.setState({ g5SecondDripPh: JSON.parse(data84) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1169,7 +1970,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5SecondDrainMls').then((data85) => {
-                this.setState({ g5SecondDrainMls: JSON.parse(data85) });
+                if (data85 !== null) {
+                    this.setState({ g5SecondDrainMls: JSON.parse(data85) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1177,7 +1985,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5SecondDrainEC').then((data86) => {
-                this.setState({ g5SecondDrainEC: JSON.parse(data86) });
+                if (data86 !== null) {
+                    this.setState({ g5SecondDrainEC: JSON.parse(data86) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1186,7 +2001,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5SecondDrainPh').then((data87) => {
-                this.setState({ g5SecondDrainPh: JSON.parse(data87) });
+                if (data87 !== null) {
+                    this.setState({ g5SecondDrainPh: JSON.parse(data87) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1194,7 +2016,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5Valve25DripMls').then((data88) => {
-                this.setState({ g5Valve25DripMls: JSON.parse(data88) });
+                if (data88 !== null) {
+                    this.setState({ g5Valve25DripMls: JSON.parse(data88) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1202,7 +2031,15 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5Valve26DripMls').then((data89) => {
-                this.setState({ g5Valve26DripMls: JSON.parse(data89) });
+                if (data89 !== null) {
+                    this.setState({ g5Valve26DripMls: JSON.parse(data89) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1210,7 +2047,14 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('g5Valve27DripMls').then((data90) => {
-                this.setState({ g5Valve27DripMls: JSON.parse(data90) });
+                if (data90 !== null) {
+                    this.setState({ g5Valve27DripMls: JSON.parse(data90) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
@@ -1223,9 +2067,20 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('bore1Hours').then((data91) => {
-                this.setState({ bore1Hours: JSON.parse(data91) });
-                console.log("BORE READINGS : " + this.state.bore1Hours);
+                if (data91 !== null) {
 
+                    this.setState({ bore1Hours: JSON.parse(data91) });
+                    this.setState({ isLoading: true })
+                    console.log("BORE READINGS : " + this.state.bore1Hours);
+
+
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -1233,7 +2088,18 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('bore1m3').then((data92) => {
-                this.setState({ bore1m3: JSON.parse(data92) });
+
+                if (data92 !== null) {
+
+                    this.setState({ bore1m3: JSON.parse(data92) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -1241,7 +2107,17 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('electricity').then((data93) => {
-                this.setState({ electricity: JSON.parse(data93) });
+
+                if (data93 !== null) {
+                    this.setState({ electricity: JSON.parse(data93) });
+                    this.setState({ isLoading: true })
+
+                } else {
+
+                    this.setState({ isLoading: false })
+
+
+                }
 
             }).done();
         } catch (error) {
@@ -1249,12 +2125,22 @@ export default class DailyReadingsGER extends React.Component {
 
         try {
             AsyncStorage.getItem('Septicm3').then((data94) => {
-                this.setState({ Septicm3: JSON.parse(data94) });
+
+                if (data94 !== null) {
+                    this.setState({ Septicm3: JSON.parse(data94) });
+                    this.setState({ isLoading: true })
+                } else {
+
+                    this.setState({ isLoading: false })
+
+                }
 
             }).done();
         } catch (error) {
         }
         //END
+
+
 
 
     }
@@ -1264,124 +2150,464 @@ export default class DailyReadingsGER extends React.Component {
     //SEND DATA BUTTON METHOD 
     sendData = () => {
 
-
-        realm.write(() => {
-            ID =
-                realm.objects('daily_readings_offline_table').sorted('entry_id', true).length > 0
-                    ? realm.objects('daily_readings_offline_table').sorted('entry_id', true)[0]
-                        .entry_id + 1
-                    : 1;
-            realm.create('daily_readings_offline_table', {
-                entry_id: ID,
-                site_name: this.state.siteName,
-                dateYesterday: this.state.dateYesterday,
-                dayYesterday: this.state.dayYesterday,
-                gas: this.state.gas,
-                liquidCO2: this.state.liquidCO2,
-                drainDischarge: this.state.drainDischarge,
-                g1SouthDripMls: this.state.g1SouthDripMls,
-                g1SouthDripEC: this.state.g1SouthDripEC,
-                g1SouthDripPh: this.state.g1SouthDripPh,
-                g1SouthDrainMls: this.state.g1SouthDrainMls,
-                g1SouthDrainEc: this.state.g1SouthDrainEc,
-                g1SouthDrainPh: this.state.g1SouthDrainPh,
-                g1NorthDripMls: this.state.g1NorthDripMls,
-                g1NorthDripEC: this.state.g1NorthDripEC,
-                g1NorthDripPh: this.state.g1NorthDripPh,
-                g1NorthDrainMls: this.state.g1NorthDrainMls,
-                g1NorthDrainEC: this.state.g1NorthDrainEC,
-                g1NorthDrainPh: this.state.g1NorthDrainPh,
-                g1Valve1DripMls: this.state.g1Valve1DripMls,
-                g1Valve2DripMls: this.state.g1Valve2DripMls,
-                g1Valve3DripMls: this.state.g1Valve3DripMls,
-                g1Valve4DripMls: this.state.g1Valve4DripMls,
-                g2SouthDripMls: this.state.g2SouthDripMls,
-                g2SouthDripEC: this.state.g2SouthDripEC,
-                g2SouthDripPh: this.state.g2SouthDripPh,
-                g2SouthDrainMls: this.state.g2SouthDrainMls,
-                g2SouthDrainEc: this.state.g2SouthDrainEc,
-                g2SouthDrainPh: this.state.g2SouthDrainPh,
-                g2NorthDripMls: this.state.g2NorthDripMls,
-                g2NorthDripEC: this.state.g2NorthDripEC,
-                g2NorthDripPh: this.state.g2NorthDripPh,
-                g2NorthDrainMls: this.state.g2NorthDrainMls,
-                g2NorthDrainEC: this.state.g2NorthDrainEC,
-                g2NorthDrainPh: this.state.g2NorthDrainPh,
-                g2Valve5DripMls: this.state.g2Valve5DripMls,
-                g2Valve6DripMls: this.state.g2Valve6DripMls,
-                g2Valve7DripMls: this.state.g2Valve7DripMls,
-                g2Valve8DripMls: this.state.g2Valve8DripMls,
-                g2Valve9DripMls: this.state.g2Valve9DripMls,
-                g2Valve10DripMls: this.state.g2Valve10DripMls,
-                g2Valve11DripMls: this.state.g2Valve11DripMls,
-                g2Valve12DripMls: this.state.g2Valve12DripMls,
-                g3SouthDripMls: this.state.g3SouthDripMls,
-                g3SouthDripEC: this.state.g3SouthDripEC,
-                g3SouthDripPh: this.state.g3SouthDripPh,
-                g3SouthDrainMls: this.state.g3SouthDrainMls,
-                g3SouthDrainEc: this.state.g3SouthDrainEc,
-                g3SouthDrainPh: this.state.g3SouthDrainPh,
-                g3NorthDripMls: this.state.g3NorthDripMls,
-                g3NorthDripEC: this.state.g3NorthDripEC,
-                g3NorthDripPh: this.state.g3NorthDripPh,
-                g3NorthDrainMls: this.state.g3NorthDrainMls,
-                g3NorthDrainEC: this.state.g3NorthDrainEC,
-                g3NorthDrainPh: this.state.g3NorthDrainPh,
-                g3Valve13DripMls: this.state.g3Valve13DripMls,
-                g3Valve14DripMls: this.state.g3Valve14DripMls,
-                g3Valve15DripMls: this.state.g3Valve15DripMls,
-                g3Valve16DripMls: this.state.g3Valve16DripMls,
-                g3Valve17DripMls: this.state.g3Valve17DripMls,
-                g3Valve18DripMls: this.state.g3Valve18DripMls,
-                g3Valve19DripMls: this.state.g3Valve19DripMls,
-                g3Valve20DripMls: this.state.g3Valve20DripMls,
-                g4SouthDripMls: this.state.g4SouthDripMls,
-                g4SouthDripEC: this.state.g4SouthDripEC,
-                g4SouthDripPh: this.state.g4SouthDripPh,
-                g4SouthDrainMls: this.state.g4SouthDrainMls,
-                g4SouthDrainEc: this.state.g4SouthDrainEc,
-                g4SouthDrainPh: this.state.g4SouthDrainPh,
-                g4NorthDripMls: this.state.g4NorthDripMls,
-                g4NorthDripEC: this.state.g4NorthDripEC,
-                g4NorthDripPh: this.state.g4NorthDripPh,
-                g4NorthDrainMls: this.state.g4NorthDrainMls,
-                g4NorthDrainEC: this.state.g4NorthDrainEC,
-                g4NorthDrainPh: this.state.g4NorthDrainPh,
-                g4Valve21DripMls: this.state.g4Valve21DripMls,
-                g4Valve22DripMls: this.state.g4Valve22DripMls,
-                g4Valve23DripMls: this.state.g4Valve23DripMls,
-                g4Valve24DripMls: this.state.g4Valve24DripMls,
-                g5FirstDripMls: this.state.g5FirstDripMls,
-                g5FirstDripEC: this.state.g5FirstDripEC,
-                g5FirstDripPh: this.state.g5FirstDripPh,
-                g5FirstDrainMls: this.state.g5FirstDrainMls,
-                g5FirstDrainEc: this.state.g5FirstDrainEc,
-                g5FirstDrainPh: this.state.g5FirstDrainPh,
-                g5SecondDripMls: this.state.g5SecondDripMls,
-                g5SecondDripEC: this.state.g5SecondDripEC,
-                g5SecondDripPh: this.state.g5SecondDripPh,
-                g5SecondDrainMls: this.state.g5SecondDrainMls,
-                g5SecondDrainEC: this.state.g5SecondDrainEC,
-                g5SecondDrainPh: this.state.g5SecondDrainPh,
-                g5Valve25DripMls: this.state.g5Valve25DripMls,
-                g5Valve26DripMls: this.state.g5Valve26DripMls,
-                g5Valve27DripMls: this.state.g5Valve27DripMls,
-                bore1Hours: this.state.bore1Hours,
-                bore1m3: this.state.bore1m3,
-                electricity: this.state.electricity,
-                Septicm3: this.state.Septicm3,
-
-            });
+        this.setState({ isLoading: true })
 
 
-        });
 
-        Toast.show('Form Submitted successfully');
-        AsyncStorage.clear();
+
+        //SEND DATA TO AWS
+
+        this.getPromiseObject(
+            'POST',
+            ' https://gfed26lq0c.execute-api.ap-southeast-2.amazonaws.com/dev/v1/saveData',
+            {
+                siteName: this.state.siteName.toString(),
+                currentDate: this.state.currentDate.toString(),
+                dateYesterday: this.state.dateYesterday.toString(),
+                dayYesterday: this.state.dayYesterday.toString(),
+                gas: this.state.gas.toString(),
+                liquidCO2: this.state.liquidCO2.toString(),
+                drainDischarge: this.state.drainDischarge.toString(),
+                g1SouthDripMls: this.state.g1SouthDripMls.toString(),
+                g1SouthDripEC: this.state.g1SouthDripEC.toString(),
+                g1SouthDripPh: this.state.g1SouthDripPh.toString(),
+                g1SouthDrainMls: this.state.g1SouthDrainMls.toString(),
+                g1SouthDrainEc: this.state.g1SouthDrainEc.toString(),
+                g1SouthDrainPh: this.state.g1SouthDrainPh.toString(),
+                g1NorthDripMls: this.state.g1NorthDripMls.toString(),
+                g1NorthDripEC: this.state.g1NorthDripEC.toString(),
+                g1NorthDripPh: this.state.g1NorthDripPh.toString(),
+                g1NorthDrainMls: this.state.g1NorthDrainMls.toString(),
+                g1NorthDrainEC: this.state.g1NorthDrainEC.toString(),
+                g1NorthDrainPh: this.state.g1NorthDrainPh.toString(),
+                g1Valve1DripMls: this.state.g1Valve1DripMls.toString(),
+                g1Valve2DripMls: this.state.g1Valve2DripMls.toString(),
+                g1Valve3DripMls: this.state.g1Valve3DripMls.toString(),
+                g1Valve4DripMls: this.state.g1Valve4DripMls.toString(),
+                g2SouthDripMls: this.state.g2SouthDripMls.toString(),
+                g2SouthDripEC: this.state.g2SouthDripEC.toString(),
+                g2SouthDripPh: this.state.g2SouthDripPh.toString(),
+                g2SouthDrainMls: this.state.g2SouthDrainMls.toString(),
+                g2SouthDrainEc: this.state.g2SouthDrainEc.toString(),
+                g2SouthDrainPh: this.state.g2SouthDrainPh.toString(),
+                g2NorthDripMls: this.state.g2NorthDripMls.toString(),
+                g2NorthDripEC: this.state.g2NorthDripEC.toString(),
+                g2NorthDripPh: this.state.g2NorthDripPh.toString(),
+                g2NorthDrainMls: this.state.g2NorthDrainMls.toString(),
+                g2NorthDrainEC: this.state.g2NorthDrainEC.toString(),
+                g2NorthDrainPh: this.state.g2NorthDrainPh.toString(),
+                g2Valve5DripMls: this.state.g2Valve5DripMls.toString(),
+                g2Valve6DripMls: this.state.g2Valve6DripMls.toString(),
+                g2Valve7DripMls: this.state.g2Valve7DripMls.toString(),
+                g2Valve8DripMls: this.state.g2Valve8DripMls.toString(),
+                g2Valve9DripMls: this.state.g2Valve9DripMls.toString(),
+                g2Valve10DripMls: this.state.g2Valve10DripMls.toString(),
+                g2Valve11DripMls: this.state.g2Valve11DripMls.toString(),
+                g2Valve12DripMls: this.state.g2Valve12DripMls.toString(),
+                g3SouthDripMls: this.state.g3SouthDripMls.toString(),
+                g3SouthDripEC: this.state.g3SouthDripEC.toString(),
+                g3SouthDripPh: this.state.g3SouthDripPh.toString(),
+                g3SouthDrainMls: this.state.g3SouthDrainMls.toString(),
+                g3SouthDrainEc: this.state.g3SouthDrainEc.toString(),
+                g3SouthDrainPh: this.state.g3SouthDrainPh.toString(),
+                g3NorthDripMls: this.state.g3NorthDripMls.toString(),
+                g3NorthDripEC: this.state.g3NorthDripEC.toString(),
+                g3NorthDripPh: this.state.g3NorthDripPh.toString(),
+                g3NorthDrainMls: this.state.g3NorthDrainMls.toString(),
+                g3NorthDrainEC: this.state.g3NorthDrainEC.toString(),
+                g3NorthDrainPh: this.state.g3NorthDrainPh.toString(),
+                g3Valve13DripMls: this.state.g3Valve13DripMls.toString(),
+                g3Valve14DripMls: this.state.g3Valve14DripMls.toString(),
+                g3Valve15DripMls: this.state.g3Valve15DripMls.toString(),
+                g3Valve16DripMls: this.state.g3Valve16DripMls.toString(),
+                g3Valve17DripMls: this.state.g3Valve17DripMls.toString(),
+                g3Valve18DripMls: this.state.g3Valve18DripMls.toString(),
+                g3Valve19DripMls: this.state.g3Valve19DripMls.toString(),
+                g3Valve20DripMls: this.state.g3Valve20DripMls.toString(),
+                g4SouthDripMls: this.state.g4SouthDripMls.toString(),
+                g4SouthDripEC: this.state.g4SouthDripEC.toString(),
+                g4SouthDripPh: this.state.g4SouthDripPh.toString(),
+                g4SouthDrainMls: this.state.g4SouthDrainMls.toString(),
+                g4SouthDrainEc: this.state.g4SouthDrainEc.toString(),
+                g4SouthDrainPh: this.state.g4SouthDrainPh.toString(),
+                g4NorthDripMls: this.state.g4NorthDripMls.toString(),
+                g4NorthDripEC: this.state.g4NorthDripEC.toString(),
+                g4NorthDripPh: this.state.g4NorthDripPh.toString(),
+                g4NorthDrainMls: this.state.g4NorthDrainMls.toString(),
+                g4NorthDrainEC: this.state.g4NorthDrainEC.toString(),
+                g4NorthDrainPh: this.state.g4NorthDrainPh.toString(),
+                g4Valve21DripMls: this.state.g4Valve21DripMls.toString(),
+                g4Valve22DripMls: this.state.g4Valve22DripMls.toString(),
+                g4Valve23DripMls: this.state.g4Valve23DripMls.toString(),
+                g4Valve24DripMls: this.state.g4Valve24DripMls.toString(),
+                g5FirstDripMls: this.state.g5FirstDripMls.toString(),
+                g5FirstDripEC: this.state.g5FirstDripEC.toString(),
+                g5FirstDripPh: this.state.g5FirstDripPh.toString(),
+                g5FirstDrainMls: this.state.g5FirstDrainMls.toString(),
+                g5FirstDrainEc: this.state.g5FirstDrainEc.toString(),
+                g5FirstDrainPh: this.state.g5FirstDrainPh.toString(),
+                g5SecondDripMls: this.state.g5SecondDripMls.toString(),
+                g5SecondDripEC: this.state.g5SecondDripEC.toString(),
+                g5SecondDripPh: this.state.g5SecondDripPh.toString(),
+                g5SecondDrainMls: this.state.g5SecondDrainMls.toString(),
+                g5SecondDrainEC: this.state.g5SecondDrainEC.toString(),
+                g5SecondDrainPh: this.state.g5SecondDrainPh.toString(),
+                g5Valve25DripMls: this.state.g5Valve25DripMls.toString(),
+                g5Valve26DripMls: this.state.g5Valve26DripMls.toString(),
+                g5Valve27DripMls: this.state.g5Valve27DripMls.toString(),
+                bore1Hours: this.state.bore1Hours.toString(),
+                bore1m3: this.state.bore1m3.toString(),
+                electricity: this.state.electricity.toString(),
+                Septicm3: this.state.Septicm3.toString(),
+            },
+            false,
+        ).then((result) => {
+            try {
+                const res = result;
+                console.log(res);
+
+                realm.write(() => {
+                    ID =
+                        realm.objects('daily_readings_offline_table').sorted('entry_id', true).length > 0
+                            ? realm.objects('daily_readings_offline_table').sorted('entry_id', true)[0]
+                                .entry_id + 1
+                            : 1;
+                    realm.create('daily_readings_offline_table', {
+                        entry_id: ID,
+                        site_name: this.state.siteName.toString(),
+                        currentDate: this.state.currentDate.toString(),
+                        dateYesterday: this.state.dateYesterday.toString(),
+                        dayYesterday: this.state.dayYesterday.toString(),
+                        gas: this.state.gas.toString(),
+                        liquidCO2: this.state.liquidCO2.toString(),
+                        drainDischarge: this.state.drainDischarge.toString(),
+                        g1SouthDripMls: this.state.g1SouthDripMls.toString(),
+                        g1SouthDripEC: this.state.g1SouthDripEC.toString(),
+                        g1SouthDripPh: this.state.g1SouthDripPh.toString(),
+                        g1SouthDrainMls: this.state.g1SouthDrainMls.toString(),
+                        g1SouthDrainEc: this.state.g1SouthDrainEc.toString(),
+                        g1SouthDrainPh: this.state.g1SouthDrainPh.toString(),
+                        g1NorthDripMls: this.state.g1NorthDripMls.toString(),
+                        g1NorthDripEC: this.state.g1NorthDripEC.toString(),
+                        g1NorthDripPh: this.state.g1NorthDripPh.toString(),
+                        g1NorthDrainMls: this.state.g1NorthDrainMls.toString(),
+                        g1NorthDrainEC: this.state.g1NorthDrainEC.toString(),
+                        g1NorthDrainPh: this.state.g1NorthDrainPh.toString(),
+                        g1Valve1DripMls: this.state.g1Valve1DripMls.toString(),
+                        g1Valve2DripMls: this.state.g1Valve2DripMls.toString(),
+                        g1Valve3DripMls: this.state.g1Valve3DripMls.toString(),
+                        g1Valve4DripMls: this.state.g1Valve4DripMls.toString(),
+                        g2SouthDripMls: this.state.g2SouthDripMls.toString(),
+                        g2SouthDripEC: this.state.g2SouthDripEC.toString(),
+                        g2SouthDripPh: this.state.g2SouthDripPh.toString(),
+                        g2SouthDrainMls: this.state.g2SouthDrainMls.toString(),
+                        g2SouthDrainEc: this.state.g2SouthDrainEc.toString(),
+                        g2SouthDrainPh: this.state.g2SouthDrainPh.toString(),
+                        g2NorthDripMls: this.state.g2NorthDripMls.toString(),
+                        g2NorthDripEC: this.state.g2NorthDripEC.toString(),
+                        g2NorthDripPh: this.state.g2NorthDripPh.toString(),
+                        g2NorthDrainMls: this.state.g2NorthDrainMls.toString(),
+                        g2NorthDrainEC: this.state.g2NorthDrainEC.toString(),
+                        g2NorthDrainPh: this.state.g2NorthDrainPh.toString(),
+                        g2Valve5DripMls: this.state.g2Valve5DripMls.toString(),
+                        g2Valve6DripMls: this.state.g2Valve6DripMls.toString(),
+                        g2Valve7DripMls: this.state.g2Valve7DripMls.toString(),
+                        g2Valve8DripMls: this.state.g2Valve8DripMls.toString(),
+                        g2Valve9DripMls: this.state.g2Valve9DripMls.toString(),
+                        g2Valve10DripMls: this.state.g2Valve10DripMls.toString(),
+                        g2Valve11DripMls: this.state.g2Valve11DripMls.toString(),
+                        g2Valve12DripMls: this.state.g2Valve12DripMls.toString(),
+                        g3SouthDripMls: this.state.g3SouthDripMls.toString(),
+                        g3SouthDripEC: this.state.g3SouthDripEC.toString(),
+                        g3SouthDripPh: this.state.g3SouthDripPh.toString(),
+                        g3SouthDrainMls: this.state.g3SouthDrainMls.toString(),
+                        g3SouthDrainEc: this.state.g3SouthDrainEc.toString(),
+                        g3SouthDrainPh: this.state.g3SouthDrainPh.toString(),
+                        g3NorthDripMls: this.state.g3NorthDripMls.toString(),
+                        g3NorthDripEC: this.state.g3NorthDripEC.toString(),
+                        g3NorthDripPh: this.state.g3NorthDripPh.toString(),
+                        g3NorthDrainMls: this.state.g3NorthDrainMls.toString(),
+                        g3NorthDrainEC: this.state.g3NorthDrainEC.toString(),
+                        g3NorthDrainPh: this.state.g3NorthDrainPh.toString(),
+                        g3Valve13DripMls: this.state.g3Valve13DripMls.toString(),
+                        g3Valve14DripMls: this.state.g3Valve14DripMls.toString(),
+                        g3Valve15DripMls: this.state.g3Valve15DripMls.toString(),
+                        g3Valve16DripMls: this.state.g3Valve16DripMls.toString(),
+                        g3Valve17DripMls: this.state.g3Valve17DripMls.toString(),
+                        g3Valve18DripMls: this.state.g3Valve18DripMls.toString(),
+                        g3Valve19DripMls: this.state.g3Valve19DripMls.toString(),
+                        g3Valve20DripMls: this.state.g3Valve20DripMls.toString(),
+                        g4SouthDripMls: this.state.g4SouthDripMls.toString(),
+                        g4SouthDripEC: this.state.g4SouthDripEC.toString(),
+                        g4SouthDripPh: this.state.g4SouthDripPh.toString(),
+                        g4SouthDrainMls: this.state.g4SouthDrainMls.toString(),
+                        g4SouthDrainEc: this.state.g4SouthDrainEc.toString(),
+                        g4SouthDrainPh: this.state.g4SouthDrainPh.toString(),
+                        g4NorthDripMls: this.state.g4NorthDripMls.toString(),
+                        g4NorthDripEC: this.state.g4NorthDripEC.toString(),
+                        g4NorthDripPh: this.state.g4NorthDripPh.toString(),
+                        g4NorthDrainMls: this.state.g4NorthDrainMls.toString(),
+                        g4NorthDrainEC: this.state.g4NorthDrainEC.toString(),
+                        g4NorthDrainPh: this.state.g4NorthDrainPh.toString(),
+                        g4Valve21DripMls: this.state.g4Valve21DripMls.toString(),
+                        g4Valve22DripMls: this.state.g4Valve22DripMls.toString(),
+                        g4Valve23DripMls: this.state.g4Valve23DripMls.toString(),
+                        g4Valve24DripMls: this.state.g4Valve24DripMls.toString(),
+                        g5FirstDripMls: this.state.g5FirstDripMls.toString(),
+                        g5FirstDripEC: this.state.g5FirstDripEC.toString(),
+                        g5FirstDripPh: this.state.g5FirstDripPh.toString(),
+                        g5FirstDrainMls: this.state.g5FirstDrainMls.toString(),
+                        g5FirstDrainEc: this.state.g5FirstDrainEc.toString(),
+                        g5FirstDrainPh: this.state.g5FirstDrainPh.toString(),
+                        g5SecondDripMls: this.state.g5SecondDripMls.toString(),
+                        g5SecondDripEC: this.state.g5SecondDripEC.toString(),
+                        g5SecondDripPh: this.state.g5SecondDripPh.toString(),
+                        g5SecondDrainMls: this.state.g5SecondDrainMls.toString(),
+                        g5SecondDrainEC: this.state.g5SecondDrainEC.toString(),
+                        g5SecondDrainPh: this.state.g5SecondDrainPh.toString(),
+                        g5Valve25DripMls: this.state.g5Valve25DripMls.toString(),
+                        g5Valve26DripMls: this.state.g5Valve26DripMls.toString(),
+                        g5Valve27DripMls: this.state.g5Valve27DripMls.toString(),
+                        bore1Hours: this.state.bore1Hours.toString(),
+                        bore1m3: this.state.bore1m3.toString(),
+                        electricity: this.state.electricity.toString(),
+                        Septicm3: this.state.Septicm3.toString(),
+
+                    });
+
+
+
+
+                });
+
+                //CLEAR ASYNC
+                AsyncStorage.clear();
+                AsyncStorage.removeItem('currentDate')
+                AsyncStorage.removeItem('dateYesterday')
+                AsyncStorage.removeItem('dayYesterday')
+                AsyncStorage.removeItem('gas')
+                AsyncStorage.removeItem('liquidCO2')
+                AsyncStorage.removeItem('drainDischarge')
+                AsyncStorage.removeItem('g1SouthDripMls')
+                AsyncStorage.removeItem('g1SouthDripEC')
+                AsyncStorage.removeItem('g1SouthDripPh')
+                AsyncStorage.removeItem('g1SouthDrainMls')
+                AsyncStorage.removeItem('g1SouthDrainEc')
+                AsyncStorage.removeItem('g1SouthDrainPh')
+                AsyncStorage.removeItem('g1NorthDripMls')
+                AsyncStorage.removeItem('g1NorthDripEC')
+                AsyncStorage.removeItem('g1NorthDripPh')
+                AsyncStorage.removeItem('g1NorthDrainMls')
+                AsyncStorage.removeItem('g1NorthDrainEC')
+                AsyncStorage.removeItem('g1NorthDrainPh')
+                AsyncStorage.removeItem('g1Valve1DripMls')
+                AsyncStorage.removeItem('g1Valve2DripMls')
+                AsyncStorage.removeItem('g1Valve4DripMls')
+                AsyncStorage.removeItem('g2SouthDripMls')
+                AsyncStorage.removeItem('g2SouthDripPh')
+                AsyncStorage.removeItem('g2SouthDrainMls')
+                AsyncStorage.removeItem('g2SouthDrainEc')
+                AsyncStorage.removeItem('g2SouthDrainPh')
+                AsyncStorage.removeItem('g2NorthDripMls')
+                AsyncStorage.removeItem('g2NorthDripEC')
+                AsyncStorage.removeItem('g2NorthDripPh')
+                AsyncStorage.removeItem('g2NorthDrainMls')
+                AsyncStorage.removeItem('g2NorthDrainEC')
+                AsyncStorage.removeItem('g2NorthDrainPh')
+                AsyncStorage.removeItem('g2Valve5DripMls')
+                AsyncStorage.removeItem('g2Valve6DripMls')
+                AsyncStorage.removeItem('g2Valve7DripMls')
+                AsyncStorage.removeItem('g2Valve8DripMls')
+                AsyncStorage.removeItem('g2Valve9DripMls')
+                AsyncStorage.removeItem('g2Valve10DripMls')
+                AsyncStorage.removeItem('g2Valve11DripMls')
+                AsyncStorage.removeItem('g2Valve12DripMls')
+                AsyncStorage.removeItem('g3SouthDripMls')
+                AsyncStorage.removeItem('g3SouthDripEC')
+                AsyncStorage.removeItem('g3SouthDripPh')
+                AsyncStorage.removeItem('g3SouthDrainMls')
+                AsyncStorage.removeItem('g3SouthDrainEc')
+                AsyncStorage.removeItem('g3SouthDrainPh')
+                AsyncStorage.removeItem('g3NorthDripMls')
+                AsyncStorage.removeItem('g3NorthDripEC')
+                AsyncStorage.removeItem('g3NorthDripPh')
+                AsyncStorage.removeItem('g3NorthDrainMls')
+                AsyncStorage.removeItem('g3NorthDrainEC')
+                AsyncStorage.removeItem('g3NorthDrainPh')
+                AsyncStorage.removeItem('g3Valve13DripMls')
+                AsyncStorage.removeItem('g3Valve14DripMls')
+                AsyncStorage.removeItem('g3Valve15DripMls')
+                AsyncStorage.removeItem('g3Valve16DripMls')
+                AsyncStorage.removeItem('g3Valve17DripMls')
+                AsyncStorage.removeItem('g3Valve18DripMls')
+                AsyncStorage.removeItem('g3Valve19DripMls')
+                AsyncStorage.removeItem('g3Valve20DripMls')
+                AsyncStorage.removeItem('g4SouthDripMls')
+                AsyncStorage.removeItem('g4SouthDripEC')
+                AsyncStorage.removeItem('g4SouthDripPh')
+                AsyncStorage.removeItem('g4SouthDrainMls')
+                AsyncStorage.removeItem('g4SouthDrainEc')
+                AsyncStorage.removeItem('g4SouthDrainPh')
+                AsyncStorage.removeItem('g4NorthDripMls')
+                AsyncStorage.removeItem('g4NorthDripEC')
+                AsyncStorage.removeItem('g4NorthDripPh')
+                AsyncStorage.removeItem('g4NorthDrainMls')
+                AsyncStorage.removeItem('g4NorthDrainEC')
+                AsyncStorage.removeItem('g4NorthDrainPh')
+                AsyncStorage.removeItem('g4Valve21DripMls')
+                AsyncStorage.removeItem('g4Valve22DripMls')
+                AsyncStorage.removeItem('g4Valve23DripMls')
+                AsyncStorage.removeItem('g4Valve24DripMls')
+                AsyncStorage.removeItem('g5FirstDripMls')
+                AsyncStorage.removeItem('g5FirstDripEC')
+                AsyncStorage.removeItem('g5FirstDripPh')
+                AsyncStorage.removeItem('g5FirstDrainMls')
+                AsyncStorage.removeItem('g5FirstDrainEc')
+                AsyncStorage.removeItem('g5FirstDrainPh')
+                AsyncStorage.removeItem('g5SecondDripMls')
+                AsyncStorage.removeItem('g5SecondDripEC')
+                AsyncStorage.removeItem('g5SecondDripPh')
+                AsyncStorage.removeItem('g5SecondDrainMls')
+                AsyncStorage.removeItem('g5SecondDrainEC')
+                AsyncStorage.removeItem('g5SecondDrainPh')
+                AsyncStorage.removeItem('g5Valve25DripMls')
+                AsyncStorage.removeItem('g5Valve26DripMls')
+                AsyncStorage.removeItem('g5Valve27DripMls')
+                AsyncStorage.removeItem('bore1Hours')
+                AsyncStorage.removeItem('bore1m3')
+                AsyncStorage.removeItem('electricity')
+                AsyncStorage.removeItem('Septicm3')
+
+                //END
+
+                //CLEAR STATE
+                this.setState({
+                    dateYesterday: '',
+                    dayYesterday: '',
+                    dayYesterday: '',
+                    gas: '',
+                    liquidCO2: '',
+                    drainDischarge: '',
+                    g1SouthDripMls: '',
+                    g1SouthDripEC: '',
+                    g1SouthDripPh: '',
+                    g1SouthDrainMls: '',
+                    g1SouthDrainEc: '',
+                    g1SouthDrainPh: '',
+                    g1NorthDripMls: '',
+                    g1NorthDripEC: '',
+                    g1NorthDripPh: '',
+                    g1NorthDrainMls: '',
+                    g1NorthDrainEC: '',
+                    g1NorthDrainPh: '',
+                    g1Valve1DripMls: '',
+                    g1Valve2DripMls: '',
+                    g1Valve4DripMls: '',
+                    g2SouthDripMls: '',
+                    g2SouthDripPh: '',
+                    g2SouthDrainMls: '',
+                    g2SouthDrainEc: '',
+                    g2SouthDrainPh: '',
+                    g2NorthDripMls: '',
+                    g2NorthDripEC: '',
+                    g2NorthDripPh: '',
+                    g2NorthDrainMls: '',
+                    g2NorthDrainEC: '',
+                    g2NorthDrainPh: '',
+                    g2Valve5DripMls: '',
+                    g2Valve6DripMls: '',
+                    g2Valve7DripMls: '',
+                    g2Valve8DripMls: '',
+                    g2Valve9DripMls: '',
+                    g2Valve10DripMls: '',
+                    g2Valve11DripMls: '',
+                    g2Valve12DripMls: '',
+                    g3SouthDripMls: '',
+                    g3SouthDripEC: '',
+                    g3SouthDripPh: '',
+                    g3SouthDrainMls: '',
+                    g3SouthDrainEc: '',
+                    g3SouthDrainPh: '',
+                    g3NorthDripMls: '',
+                    g3NorthDripEC: '',
+                    g3NorthDripPh: '',
+                    g3NorthDrainMls: '',
+                    g3NorthDrainEC: '',
+                    g3NorthDrainPh: '',
+                    g3Valve13DripMls: '',
+                    g3Valve14DripMls: '',
+                    g3Valve15DripMls: '',
+                    g3Valve16DripMls: '',
+                    g3Valve17DripMls: '',
+                    g3Valve18DripMls: '',
+                    g3Valve19DripMls: '',
+                    g3Valve20DripMls: '',
+                    g4SouthDripMls: '',
+                    g4SouthDripEC: '',
+                    g4SouthDripPh: '',
+                    g4SouthDrainMls: '',
+                    g4SouthDrainEc: '',
+                    g4SouthDrainPh: '',
+                    g4NorthDripMls: '',
+                    g4NorthDripEC: '',
+                    g4NorthDripPh: '',
+                    g4NorthDrainMls: '',
+                    g4NorthDrainEC: '',
+                    g4NorthDrainPh: '',
+                    g4Valve21DripMls: '',
+                    g4Valve22DripMls: '',
+                    g4Valve23DripMls: '',
+                    g4Valve24DripMls: '',
+                    g5FirstDripMls: '',
+                    g5FirstDripEC: '',
+                    g5FirstDripPh: '',
+                    g5FirstDrainMls: '',
+                    g5FirstDrainEc: '',
+                    g5FirstDrainPh: '',
+                    g5SecondDripMls: '',
+                    g5SecondDripEC: '',
+                    g5SecondDripPh: '',
+                    g5SecondDrainMls: '',
+                    g5SecondDrainEC: '',
+                    g5SecondDrainPh: '',
+                    g5Valve25DripMls: '',
+                    g5Valve26DripMls: '',
+                    g5Valve27DripMls: '',
+                    bore1Hours: '',
+                    bore1m3: '',
+                    electricity: '',
+                    Septicm3: '',
+                })
+
+                //
+                this.props.navigation.navigate('DailyReadingsGER')
+                Toast.show('Form Submitted successfully');
+                //window.scrollTo(0, 0)
+                this.setState({ isLoading: false })
+
+
+            } catch (error) {
+                console.log(error);
+            }
+        },
+            function error(err) {
+                if (!err)
+                    err = 'Connection Refused (cors issue or server address not found)';
+            },
+        );
+
+
+
+
+        //END
 
 
     }
     //
+
+    goToTop = () => {
+        this.scroll.scrollTo({ x: 0, y: 0, animated: true });
+    }
 
     componentWillUnmount() {
         BackHandler.removeEventListener('hardwareBackPress', this.handleBackButton);
@@ -1390,6 +2616,15 @@ export default class DailyReadingsGER extends React.Component {
 
     render() {
 
+        if (this.state.isLoading) {
+            return (
+                <View style={styles.activity}>
+                    <Text style={styles.btnText}>Loading Please Wait...</Text>
+                    <ActivityIndicator size="large" color="#0000ff" />
+                </View>
+            )
+        }
+
         return (
 
             <View style={styles.container}>
@@ -1397,7 +2632,8 @@ export default class DailyReadingsGER extends React.Component {
                 <ImageBackground source={require('../assets/background2.png')} style={styles.backgroundImage}>
 
                     <ScrollView style={styles.formContainer}
-                        keyboardShouldPersistTaps='handled'>
+                        keyboardShouldPersistTaps='handled'
+                    >
 
                         <View style={styles.marginDimension}></View>
 
@@ -1521,10 +2757,10 @@ export default class DailyReadingsGER extends React.Component {
                                 onChangeText={(text) => this.updateTextInput(text, 'drainDischarge')}
                                 value={this.state.drainDischarge}
                                 editable={true}
-                                returnKeyType={"next"}
+                                returnKeyType={"done"}
                                 keyboardType={'numeric'}
                                 ref={(input) => { this.drainDischarge = input; }}
-                                blurOnSubmit={false}
+                                blurOnSubmit={true}
 
                             />
 
@@ -3956,6 +5192,15 @@ const styles = StyleSheet.create({
         fontSize: 17,
         color: 'black',
         padding: 10
+    },
+    activity: {
+        position: 'absolute',
+        left: 0,
+        right: 0,
+        top: 0,
+        bottom: 0,
+        alignItems: 'center',
+        justifyContent: 'center'
     },
     headerText: {
         color: '#000000',

@@ -44,6 +44,7 @@ export default class App extends Component {
           properties: {
             entry_id: { type: 'int', default: 0 },
             site_name: 'string',
+            currentDate: 'string',
             dateYesterday: 'string',
             dayYesterday: 'string',
             gas: 'string',

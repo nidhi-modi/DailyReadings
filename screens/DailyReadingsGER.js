@@ -3030,8 +3030,6 @@ export default class DailyReadingsGER extends React.Component {
         this.setState({ isLoading: true })
 
 
-
-
         //SEND DATA TO AWS
 
         this.getPromiseObject(
@@ -3259,6 +3257,8 @@ export default class DailyReadingsGER extends React.Component {
 
                 //CLEAR ASYNC
                 AsyncStorage.clear();
+                this.setState({currentDate: '',
+                dateYesterday: ''})
                 AsyncStorage.removeItem('currentDate')
                 AsyncStorage.removeItem('dateYesterday')
                 AsyncStorage.removeItem('dayYesterday')

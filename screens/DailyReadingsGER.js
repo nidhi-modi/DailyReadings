@@ -559,8 +559,7 @@ export default class DailyReadingsGER extends React.Component {
 
         //CHECK INTERNET
 
-        this.CheckConnectivity();
-
+        NetInfo.addEventListener(this.handleConnectivityChange);
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
 
 
@@ -619,6 +618,8 @@ export default class DailyReadingsGER extends React.Component {
     renderEntryDate = () => {
 
         const currentDate2 = moment().subtract(1, 'days').format("DD/MM/YYYY");
+
+        console.log("Yesterday's date : "+currentDate2);
 
         const entryData = this.state.sample;
         //const convertEntryData = JSON.stringify(entryData.body.rows[0])
@@ -1550,8 +1551,6 @@ export default class DailyReadingsGER extends React.Component {
 
 
         //SEND DATA TO AWS
-
-        this.CheckConnectivity();
 
         if (this.state.isItConnected === 'Online') {
 

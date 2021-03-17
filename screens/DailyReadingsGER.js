@@ -192,9 +192,9 @@ export default class DailyReadingsGER extends React.Component {
         if (Platform.OS === "android") {
             NetInfo.isConnected.fetch().then(isConnected => {
                 if (isConnected) {
-                    Alert.alert("You are online!");
+                    this.setState({ isItConnected: 'Online' });
                 } else {
-                    Alert.alert("You are offline!");
+                    this.setState({ isItConnected: 'Offline' });
                 }
             });
         } else {
@@ -213,9 +213,9 @@ export default class DailyReadingsGER extends React.Component {
         );
 
         if (isConnected === false) {
-            Alert.alert("You are offline!");
+            this.setState({ isItConnected: 'Offline' });
         } else {
-            Alert.alert("You are online!");
+            this.setState({ isItConnected: 'Online' });
         }
     };
 
@@ -556,6 +556,10 @@ export default class DailyReadingsGER extends React.Component {
             });
 
         }*/
+
+        //CHECK INTERNET
+
+        this.CheckConnectivity();
 
         BackHandler.addEventListener('hardwareBackPress', this.handleBackButton);
 
@@ -1546,6 +1550,8 @@ export default class DailyReadingsGER extends React.Component {
 
 
         //SEND DATA TO AWS
+
+        this.CheckConnectivity();
 
         if (this.state.isItConnected === 'Online') {
 
@@ -4694,8 +4700,8 @@ const styles = StyleSheet.create({
         height: '100%',
         width: '100%'
 
-
     },
+
     titleHeadingText: {
 
         color: '#2C903D',

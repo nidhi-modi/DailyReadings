@@ -1,5 +1,5 @@
 import React, { Component } from 'react';
-import { Button, Image, StyleSheet, Text, TouchableOpacity, Alert, Linking, View } from 'react-native'
+import { Button, Image, StyleSheet, Text, TouchableOpacity, Platform, Alert, Linking, View } from 'react-native'
 
 
 import { NavigationContainer } from '@react-navigation/native'
@@ -28,7 +28,7 @@ function MainStackNavigator() {
                     //gestureEnabled: true,
                     headerStyle: {
                         backgroundColor: '#2C903D',
-                        height: 95
+                        height: Platform.OS === 'ios' ? 120 : 95
                     },
                     headerTitleStyle: {
                         fontWeight: 'bold'

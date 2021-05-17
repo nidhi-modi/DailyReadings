@@ -619,7 +619,7 @@ export default class DailyReadingsGER extends React.Component {
 
         const currentDate2 = moment().subtract(1, 'days').format("DD/MM/YYYY");
 
-        console.log("Yesterday's date : "+currentDate2);
+        console.log("Yesterday's date : " + currentDate2);
 
         const entryData = this.state.sample;
         //const convertEntryData = JSON.stringify(entryData.body.rows[0])
@@ -1554,6 +1554,557 @@ export default class DailyReadingsGER extends React.Component {
 
         if (this.state.isItConnected === 'Online') {
 
+            if (this.state.gas === null) {
+
+                this.setState({ gas: '0' })
+
+            }
+
+            if (this.state.liquidCO2 === null) {
+
+                this.setState({ liquidCO2: '0' })
+
+            }
+
+            if (this.state.drainDischarge === null) {
+
+                this.setState({ drainDischarge: '0' })
+
+            }
+
+            if (this.state.g1SouthDripMls === null) {
+
+                this.setState({ g1SouthDripMls: '0' })
+
+            }
+
+            if (this.state.g1SouthDripEC === null) {
+
+                this.setState({ g1SouthDripEC: '0' })
+
+            }
+
+            if (this.state.g1SouthDripPh === null) {
+
+                this.setState({ g1SouthDripPh: '0' })
+
+            }
+
+            if (this.state.g1SouthDrainMls === null) {
+
+                this.setState({ g1SouthDrainMls: '0' })
+
+            }
+
+            if (this.state.g1SouthDrainEc === null) {
+
+                this.setState({ g1SouthDrainEc: '0' })
+
+            }
+
+            if (this.state.g1SouthDrainPh === null) {
+
+                this.setState({ g1SouthDrainPh: '0' })
+
+            }
+
+            if (this.state.g1NorthDripMls === null) {
+
+                this.setState({ g1NorthDripMls: '0' })
+
+            }
+
+            if (this.state.g1NorthDripEC === null) {
+
+                this.setState({ g1NorthDripEC: '0' })
+
+            }
+
+            if (this.state.g1NorthDripPh === null) {
+
+                this.setState({ g1NorthDripPh: '0' })
+
+            }
+
+            if (this.state.g1NorthDrainMls === null) {
+
+                this.setState({ g1NorthDrainMls: '0' })
+
+            }
+
+            if (this.state.g1NorthDrainEC === null) {
+
+                this.setState({ g1NorthDrainEC: '0' })
+
+            }
+
+            if (this.state.g1NorthDrainPh === null) {
+
+                this.setState({ g1NorthDrainPh: '0' })
+
+            }
+
+            if (this.state.g1Valve1DripMls === null) {
+
+                this.setState({ g1Valve1DripMls: '0' })
+
+            }
+
+            if (this.state.g1Valve2DripMls === null) {
+
+                this.setState({ g1Valve2DripMls: '0' })
+
+            }
+
+            if (this.state.g1Valve3DripMls === null) {
+
+                this.setState({ g1Valve3DripMls: '0' })
+
+            }
+
+            if (this.state.g1Valve4DripMls === null) {
+
+                this.setState({ g1Valve4DripMls: '0' })
+
+            }
+
+            if (this.state.g2SouthDripMls === null) {
+
+                this.setState({ g2SouthDripMls: '0' })
+
+            }
+
+            if (this.state.g2SouthDripEC === null) {
+
+                this.setState({ g2SouthDripEC: '0' })
+
+            }
+
+            if (this.state.g2SouthDripPh === null) {
+
+                this.setState({ g2SouthDripPh: '0' })
+
+            }
+
+            if (this.state.g2SouthDrainMls === null) {
+
+                this.setState({ g2SouthDrainMls: '0' })
+
+            }
+
+            if (this.state.g2SouthDrainEc === null) {
+
+                this.setState({ g2SouthDrainEc: '0' })
+
+            }
+
+            if (this.state.g2SouthDrainPh === null) {
+
+                this.setState({ g2SouthDrainPh: '0' })
+
+            }
+
+            if (this.state.g2NorthDripMls === null) {
+
+                this.setState({ g2NorthDripMls: '0' })
+
+            }
+
+            if (this.state.g2NorthDripEC === null) {
+
+                this.setState({ g2NorthDripEC: '0' })
+
+            }
+
+            if (this.state.g2NorthDripPh === null) {
+
+                this.setState({ g2NorthDripPh: '0' })
+
+            }
+
+            if (this.state.g2NorthDrainMls === null) {
+
+                this.setState({ g2NorthDrainMls: '0' })
+
+            }
+
+            if (this.state.g2NorthDrainEC === null) {
+
+                this.setState({ g2NorthDrainEC: '0' })
+
+            }
+
+            if (this.state.g2NorthDrainPh === null) {
+
+                this.setState({ g2NorthDrainPh: '0' })
+
+            }
+
+            if (this.state.g2Valve5DripMls === null) {
+
+                this.setState({ g2Valve5DripMls: '0' })
+
+            }
+
+            if (this.state.g2Valve6DripMls === null) {
+
+                this.setState({ g2Valve6DripMls: '0' })
+
+            }
+
+            if (this.state.g2Valve7DripMls === null) {
+
+                this.setState({ g2Valve7DripMls: '0' })
+
+            }
+
+            if (this.state.g2Valve8DripMls === null) {
+
+                this.setState({ g2Valve8DripMls: '0' })
+
+            }
+
+            if (this.state.g2Valve9DripMls === null) {
+
+                this.setState({ g2Valve9DripMls: '0' })
+
+            }
+
+            if (this.state.g2Valve10DripMls === null) {
+
+                this.setState({ g2Valve10DripMls: '0' })
+
+            }
+
+            if (this.state.g2Valve11DripMls === null) {
+
+                this.setState({ g2Valve11DripMls: '0' })
+
+            }
+
+            if (this.state.g2Valve12DripMls === null) {
+
+                this.setState({ g2Valve12DripMls: '0' })
+
+            }
+
+            if (this.state.g3SouthDripMls === null) {
+
+                this.setState({ g3SouthDripMls: '0' })
+
+            }
+
+            if (this.state.g3SouthDripEC === null) {
+
+                this.setState({ g3SouthDripEC: '0' })
+
+            }
+
+            if (this.state.g3SouthDripPh === null) {
+
+                this.setState({ g3SouthDripPh: '0' })
+
+            }
+
+
+            if (this.state.g3SouthDrainMls === null) {
+
+                this.setState({ g3SouthDrainMls: '0' })
+
+            }
+
+            if (this.state.g3SouthDrainEc === null) {
+
+                this.setState({ g3SouthDrainEc: '0' })
+
+            }
+
+            if (this.state.g3SouthDrainPh === null) {
+
+                this.setState({ g3SouthDrainPh: '0' })
+
+            }
+
+            if (this.state.g3NorthDrainMls === null) {
+
+                this.setState({ g3NorthDrainMls: '0' })
+
+            }
+
+            if (this.state.g3NorthDrainEC === null) {
+
+                this.setState({ g3NorthDrainEC: '0' })
+
+            }
+
+            if (this.state.g3NorthDrainPh === null) {
+
+                this.setState({ g3NorthDrainPh: '0' })
+
+            }
+
+            if (this.state.g3Valve13DripMls === null) {
+
+                this.setState({ g3Valve13DripMls: '0' })
+
+            }
+
+            if (this.state.g3Valve14DripMls === null) {
+
+                this.setState({ g3Valve14DripMls: '0' })
+
+            }
+
+            if (this.state.g3Valve15DripMls === null) {
+
+                this.setState({ g3Valve15DripMls: '0' })
+
+            }
+
+            if (this.state.g3Valve16DripMls === null) {
+
+                this.setState({ g3Valve16DripMls: '0' })
+
+            }
+
+            if (this.state.g3Valve17DripMls === null) {
+
+                this.setState({ g3Valve17DripMls: '0' })
+
+            }
+
+            if (this.state.g3Valve18DripMls === null) {
+
+                this.setState({ g3Valve18DripMls: '0' })
+
+            }
+
+            if (this.state.g3Valve19DripMls === null) {
+
+                this.setState({ g3Valve19DripMls: '0' })
+
+            }
+
+            if (this.state.g3Valve20DripMls === null) {
+
+                this.setState({ g3Valve20DripMls: '0' })
+
+            }
+
+            if (this.state.g4SouthDripMls === null) {
+
+                this.setState({ g4SouthDripMls: '0' })
+
+            }
+
+            if (this.state.g4SouthDripEC === null) {
+
+                this.setState({ g4SouthDripEC: '0' })
+
+            }
+
+            if (this.state.g4SouthDripPh === null) {
+
+                this.setState({ g4SouthDripPh: '0' })
+
+            }
+
+            if (this.state.g4SouthDrainMls === null) {
+
+                this.setState({ g4SouthDrainMls: '0' })
+
+            }
+
+            if (this.state.g4SouthDrainEc === null) {
+
+                this.setState({ g4SouthDrainEc: '0' })
+
+            }
+
+            if (this.state.g4SouthDrainPh === null) {
+
+                this.setState({ g4SouthDrainPh: '0' })
+
+            }
+
+            if (this.state.g4NorthDripMls === null) {
+
+                this.setState({ g4NorthDripMls: '0' })
+
+            }
+
+            if (this.state.g4NorthDripEC === null) {
+
+                this.setState({ g4NorthDripEC: '0' })
+
+            }
+
+            if (this.state.g4NorthDripPh === null) {
+
+                this.setState({ g4NorthDripPh: '0' })
+
+            }
+
+            if (this.state.g4NorthDrainMls === null) {
+
+                this.setState({ g4NorthDrainMls: '0' })
+
+            }
+
+            if (this.state.g4NorthDrainEC === null) {
+
+                this.setState({ g4NorthDrainEC: '0' })
+
+            }
+
+            if (this.state.g4NorthDrainPh === null) {
+
+                this.setState({ g4NorthDrainPh: '0' })
+
+            }
+
+            if (this.state.g4Valve21DripMls === null) {
+
+                this.setState({ g4Valve21DripMls: '0' })
+
+            }
+
+            if (this.state.g4Valve22DripMls === null) {
+
+                this.setState({ g4Valve22DripMls: '0' })
+
+            }
+
+            if (this.state.g4Valve23DripMls === null) {
+
+                this.setState({ g4Valve23DripMls: '0' })
+
+            }
+
+            if (this.state.g4Valve24DripMls === null) {
+
+                this.setState({ g4Valve24DripMls: '0' })
+
+            }
+
+            if (this.state.g5FirstDripMls === null) {
+
+                this.setState({ g5FirstDripMls: '0' })
+
+            }
+
+            if (this.state.g5FirstDripEC === null) {
+
+                this.setState({ g5FirstDripEC: '0' })
+
+            }
+
+            if (this.state.g5FirstDripPh === null) {
+
+                this.setState({ g5FirstDripPh: '0' })
+
+            }
+
+            if (this.state.g5FirstDrainMls === null) {
+
+                this.setState({ g5FirstDrainMls: '0' })
+
+            }
+
+            if (this.state.g5FirstDrainEc === null) {
+
+                this.setState({ g5FirstDrainEc: '0' })
+
+            }
+
+            if (this.state.g5FirstDrainPh === null) {
+
+                this.setState({ g5FirstDrainPh: '0' })
+
+            }
+
+            if (this.state.g5SecondDripMls === null) {
+
+                this.setState({ g5SecondDripMls: '0' })
+
+            }
+
+            if (this.state.g5SecondDripEC === null) {
+
+                this.setState({ g5SecondDripEC: '0' })
+
+            }
+
+            if (this.state.g5SecondDripPh === null) {
+
+                this.setState({ g5SecondDripPh: '0' })
+
+            }
+
+            if (this.state.g5SecondDrainMls === null) {
+
+                this.setState({ g5SecondDrainMls: '0' })
+
+            }
+
+            if (this.state.g5SecondDrainEC === null) {
+
+                this.setState({ g5SecondDrainEC: '0' })
+
+            }
+
+            if (this.state.g5SecondDrainPh === null) {
+
+                this.setState({ g5SecondDrainPh: '0' })
+
+            }
+
+
+
+            if (this.state.g5Valve25DripMls === null) {
+
+                this.setState({ g5Valve25DripMls: '0' })
+
+            }
+
+            if (this.state.g5Valve26DripMls === null) {
+
+                this.setState({ g5Valve26DripMls: '0' })
+
+            }
+
+            if (this.state.g5Valve27DripMls === null) {
+
+                this.setState({ g5Valve27DripMls: '0' })
+
+            }
+
+            if (this.state.bore1Hours === null) {
+
+                this.setState({ bore1Hours: '0' })
+
+            }
+
+            if (this.state.bore1m3 === null) {
+
+                this.setState({ bore1m3: '0' })
+
+            }
+
+            if (this.state.electricity === null) {
+
+                this.setState({ electricity: '0' })
+
+            }
+
+            if (this.state.Septicm3 === null) {
+
+                this.setState({ Septicm3: '0' })
+
+            }
+
+
+
             this.getPromiseObject(
                 'POST',
                 ' https://gfed26lq0c.execute-api.ap-southeast-2.amazonaws.com/dev/v1/saveData',
@@ -1562,100 +2113,100 @@ export default class DailyReadingsGER extends React.Component {
                     currentDate: this.state.currentDate.toString(),
                     dateYesterday: this.state.dateYesterday.toString(),
                     dayYesterday: this.state.dayYesterday.toString(),
-                    gas: this.state.gas.toString(),
-                    liquidCO2: this.state.liquidCO2.toString(),
-                    drainDischarge: this.state.drainDischarge.toString(),
-                    g1SouthDripMls: this.state.g1SouthDripMls.toString(),
-                    g1SouthDripEC: this.state.g1SouthDripEC.toString(),
-                    g1SouthDripPh: this.state.g1SouthDripPh.toString(),
-                    g1SouthDrainMls: this.state.g1SouthDrainMls.toString(),
-                    g1SouthDrainEc: this.state.g1SouthDrainEc.toString(),
-                    g1SouthDrainPh: this.state.g1SouthDrainPh.toString(),
-                    g1NorthDripMls: this.state.g1NorthDripMls.toString(),
-                    g1NorthDripEC: this.state.g1NorthDripEC.toString(),
-                    g1NorthDripPh: this.state.g1NorthDripPh.toString(),
-                    g1NorthDrainMls: this.state.g1NorthDrainMls.toString(),
-                    g1NorthDrainEC: this.state.g1NorthDrainEC.toString(),
-                    g1NorthDrainPh: this.state.g1NorthDrainPh.toString(),
-                    g1Valve1DripMls: this.state.g1Valve1DripMls.toString(),
-                    g1Valve2DripMls: this.state.g1Valve2DripMls.toString(),
-                    g1Valve3DripMls: this.state.g1Valve3DripMls.toString(),
-                    g1Valve4DripMls: this.state.g1Valve4DripMls.toString(),
-                    g2SouthDripMls: this.state.g2SouthDripMls.toString(),
-                    g2SouthDripEC: this.state.g2SouthDripEC.toString(),
-                    g2SouthDripPh: this.state.g2SouthDripPh.toString(),
-                    g2SouthDrainMls: this.state.g2SouthDrainMls.toString(),
-                    g2SouthDrainEc: this.state.g2SouthDrainEc.toString(),
-                    g2SouthDrainPh: this.state.g2SouthDrainPh.toString(),
-                    g2NorthDripMls: this.state.g2NorthDripMls.toString(),
-                    g2NorthDripEC: this.state.g2NorthDripEC.toString(),
-                    g2NorthDripPh: this.state.g2NorthDripPh.toString(),
-                    g2NorthDrainMls: this.state.g2NorthDrainMls.toString(),
-                    g2NorthDrainEC: this.state.g2NorthDrainEC.toString(),
-                    g2NorthDrainPh: this.state.g2NorthDrainPh.toString(),
-                    g2Valve5DripMls: this.state.g2Valve5DripMls.toString(),
-                    g2Valve6DripMls: this.state.g2Valve6DripMls.toString(),
-                    g2Valve7DripMls: this.state.g2Valve7DripMls.toString(),
-                    g2Valve8DripMls: this.state.g2Valve8DripMls.toString(),
-                    g2Valve9DripMls: this.state.g2Valve9DripMls.toString(),
-                    g2Valve10DripMls: this.state.g2Valve10DripMls.toString(),
-                    g2Valve11DripMls: this.state.g2Valve11DripMls.toString(),
-                    g2Valve12DripMls: this.state.g2Valve12DripMls.toString(),
-                    g3SouthDripMls: this.state.g3SouthDripMls.toString(),
-                    g3SouthDripEC: this.state.g3SouthDripEC.toString(),
-                    g3SouthDripPh: this.state.g3SouthDripPh.toString(),
-                    g3SouthDrainMls: this.state.g3SouthDrainMls.toString(),
-                    g3SouthDrainEc: this.state.g3SouthDrainEc.toString(),
-                    g3SouthDrainPh: this.state.g3SouthDrainPh.toString(),
-                    g3NorthDripMls: this.state.g3NorthDripMls.toString(),
-                    g3NorthDripEC: this.state.g3NorthDripEC.toString(),
-                    g3NorthDripPh: this.state.g3NorthDripPh.toString(),
-                    g3NorthDrainMls: this.state.g3NorthDrainMls.toString(),
-                    g3NorthDrainEC: this.state.g3NorthDrainEC.toString(),
-                    g3NorthDrainPh: this.state.g3NorthDrainPh.toString(),
-                    g3Valve13DripMls: this.state.g3Valve13DripMls.toString(),
-                    g3Valve14DripMls: this.state.g3Valve14DripMls.toString(),
-                    g3Valve15DripMls: this.state.g3Valve15DripMls.toString(),
-                    g3Valve16DripMls: this.state.g3Valve16DripMls.toString(),
-                    g3Valve17DripMls: this.state.g3Valve17DripMls.toString(),
-                    g3Valve18DripMls: this.state.g3Valve18DripMls.toString(),
-                    g3Valve19DripMls: this.state.g3Valve19DripMls.toString(),
-                    g3Valve20DripMls: this.state.g3Valve20DripMls.toString(),
-                    g4SouthDripMls: this.state.g4SouthDripMls.toString(),
-                    g4SouthDripEC: this.state.g4SouthDripEC.toString(),
-                    g4SouthDripPh: this.state.g4SouthDripPh.toString(),
-                    g4SouthDrainMls: this.state.g4SouthDrainMls.toString(),
-                    g4SouthDrainEc: this.state.g4SouthDrainEc.toString(),
-                    g4SouthDrainPh: this.state.g4SouthDrainPh.toString(),
-                    g4NorthDripMls: this.state.g4NorthDripMls.toString(),
-                    g4NorthDripEC: this.state.g4NorthDripEC.toString(),
-                    g4NorthDripPh: this.state.g4NorthDripPh.toString(),
-                    g4NorthDrainMls: this.state.g4NorthDrainMls.toString(),
-                    g4NorthDrainEC: this.state.g4NorthDrainEC.toString(),
-                    g4NorthDrainPh: this.state.g4NorthDrainPh.toString(),
-                    g4Valve21DripMls: this.state.g4Valve21DripMls.toString(),
-                    g4Valve22DripMls: this.state.g4Valve22DripMls.toString(),
-                    g4Valve23DripMls: this.state.g4Valve23DripMls.toString(),
-                    g4Valve24DripMls: this.state.g4Valve24DripMls.toString(),
-                    g5FirstDripMls: this.state.g5FirstDripMls.toString(),
-                    g5FirstDripEC: this.state.g5FirstDripEC.toString(),
-                    g5FirstDripPh: this.state.g5FirstDripPh.toString(),
-                    g5FirstDrainMls: this.state.g5FirstDrainMls.toString(),
-                    g5FirstDrainEc: this.state.g5FirstDrainEc.toString(),
-                    g5FirstDrainPh: this.state.g5FirstDrainPh.toString(),
-                    g5SecondDripMls: this.state.g5SecondDripMls.toString(),
-                    g5SecondDripEC: this.state.g5SecondDripEC.toString(),
-                    g5SecondDripPh: this.state.g5SecondDripPh.toString(),
-                    g5SecondDrainMls: this.state.g5SecondDrainMls.toString(),
-                    g5SecondDrainEC: this.state.g5SecondDrainEC.toString(),
-                    g5SecondDrainPh: this.state.g5SecondDrainPh.toString(),
-                    g5Valve25DripMls: this.state.g5Valve25DripMls.toString(),
-                    g5Valve26DripMls: this.state.g5Valve26DripMls.toString(),
-                    g5Valve27DripMls: this.state.g5Valve27DripMls.toString(),
-                    bore1Hours: this.state.bore1Hours.toString(),
-                    bore1m3: this.state.bore1m3.toString(),
-                    electricity: this.state.electricity.toString(),
-                    Septicm3: this.state.Septicm3.toString(),
+                    gas: parseInt(this.state.gas),
+                    liquidCO2: parseFloat(this.state.liquidCO2),
+                    drainDischarge: parseInt(this.state.drainDischarge),
+                    g1SouthDripMls: parseInt(this.state.g1SouthDripMls),
+                    g1SouthDripEC: parseFloat(this.state.g1SouthDripEC),
+                    g1SouthDripPh: parseFloat(this.state.g1SouthDripPh),
+                    g1SouthDrainMls: parseInt(this.state.g1SouthDrainMls),
+                    g1SouthDrainEc: parseFloat(this.state.g1SouthDrainEc),
+                    g1SouthDrainPh: parseFloat(this.state.g1SouthDrainPh),
+                    g1NorthDripMls: parseInt(this.state.g1NorthDripMls),
+                    g1NorthDripEC: parseFloat(this.state.g1NorthDripEC),
+                    g1NorthDripPh: parseFloat(this.state.g1NorthDripPh),
+                    g1NorthDrainMls: parseInt(this.state.g1NorthDrainMls),
+                    g1NorthDrainEC: parseFloat(this.state.g1NorthDrainEC),
+                    g1NorthDrainPh: parseFloat(this.state.g1NorthDrainPh),
+                    g1Valve1DripMls: parseInt(this.state.g1Valve1DripMls),
+                    g1Valve2DripMls: parseInt(this.state.g1Valve2DripMls),
+                    g1Valve3DripMls: parseInt(this.state.g1Valve3DripMls),
+                    g1Valve4DripMls: parseInt(this.state.g1Valve4DripMls),
+                    g2SouthDripMls: parseInt(this.state.g2SouthDripMls),
+                    g2SouthDripEC: parseFloat(this.state.g2SouthDripEC),
+                    g2SouthDripPh: parseFloat(this.state.g2SouthDripPh),
+                    g2SouthDrainMls: parseInt(this.state.g2SouthDrainMls),
+                    g2SouthDrainEc: parseFloat(this.state.g2SouthDrainEc),
+                    g2SouthDrainPh: parseFloat(this.state.g2SouthDrainPh),
+                    g2NorthDripMls: parseInt(this.state.g2NorthDripMls),
+                    g2NorthDripEC: parseFloat(this.state.g2NorthDripEC),
+                    g2NorthDripPh: parseFloat(this.state.g2NorthDripPh),
+                    g2NorthDrainMls: parseInt(this.state.g2NorthDrainMls),
+                    g2NorthDrainEC: parseFloat(this.state.g2NorthDrainEC),
+                    g2NorthDrainPh: parseFloat(this.state.g2NorthDrainPh),
+                    g2Valve5DripMls: parseInt(this.state.g2Valve5DripMls),
+                    g2Valve6DripMls: parseInt(this.state.g2Valve6DripMls),
+                    g2Valve7DripMls: parseInt(this.state.g2Valve7DripMls),
+                    g2Valve8DripMls: parseInt(this.state.g2Valve8DripMls),
+                    g2Valve9DripMls: parseInt(this.state.g2Valve9DripMls),
+                    g2Valve10DripMls: parseInt(this.state.g2Valve10DripMls),
+                    g2Valve11DripMls: parseInt(this.state.g2Valve11DripMls),
+                    g2Valve12DripMls: parseInt(this.state.g2Valve12DripMls),
+                    g3SouthDripMls: parseInt(this.state.g3SouthDripMls),
+                    g3SouthDripEC: parseFloat(this.state.g3SouthDripEC),
+                    g3SouthDripPh: parseFloat(this.state.g3SouthDripPh),
+                    g3SouthDrainMls: parseInt(this.state.g3SouthDrainMls),
+                    g3SouthDrainEc: parseFloat(this.state.g3SouthDrainEc),
+                    g3SouthDrainPh: parseFloat(this.state.g3SouthDrainPh),
+                    g3NorthDripMls: parseInt(this.state.g3NorthDripMls),
+                    g3NorthDripEC: parseFloat(this.state.g3NorthDripEC),
+                    g3NorthDripPh: parseFloat(this.state.g3NorthDripPh),
+                    g3NorthDrainMls: parseInt(this.state.g3NorthDrainMls),
+                    g3NorthDrainEC: parseFloat(this.state.g3NorthDrainEC),
+                    g3NorthDrainPh: parseFloat(this.state.g3NorthDrainPh),
+                    g3Valve13DripMls: parseInt(this.state.g3Valve13DripMls),
+                    g3Valve14DripMls: parseInt(this.state.g3Valve14DripMls),
+                    g3Valve15DripMls: parseInt(this.state.g3Valve15DripMls),
+                    g3Valve16DripMls: parseInt(this.state.g3Valve16DripMls),
+                    g3Valve17DripMls: parseInt(this.state.g3Valve17DripMls),
+                    g3Valve18DripMls: parseInt(this.state.g3Valve18DripMls),
+                    g3Valve19DripMls: parseInt(this.state.g3Valve19DripMls),
+                    g3Valve20DripMls: parseInt(this.state.g3Valve20DripMls),
+                    g4SouthDripMls: parseInt(this.state.g4SouthDripMls),
+                    g4SouthDripEC: parseFloat(this.state.g4SouthDripEC),
+                    g4SouthDripPh: parseFloat(this.state.g4SouthDripPh),
+                    g4SouthDrainMls: parseInt(this.state.g4SouthDrainMls),
+                    g4SouthDrainEc: parseFloat(this.state.g4SouthDrainEc),
+                    g4SouthDrainPh: parseFloat(this.state.g4SouthDrainPh),
+                    g4NorthDripMls: parseInt(this.state.g4NorthDripMls),
+                    g4NorthDripEC: parseFloat(this.state.g4NorthDripEC),
+                    g4NorthDripPh: parseFloat(this.state.g4NorthDripPh),
+                    g4NorthDrainMls: parseInt(this.state.g4NorthDrainMls),
+                    g4NorthDrainEC: parseFloat(this.state.g4NorthDrainEC),
+                    g4NorthDrainPh: parseFloat(this.state.g4NorthDrainPh),
+                    g4Valve21DripMls: parseInt(this.state.g4Valve21DripMls),
+                    g4Valve22DripMls: parseInt(this.state.g4Valve22DripMls),
+                    g4Valve23DripMls: parseInt(this.state.g4Valve23DripMls),
+                    g4Valve24DripMls: parseInt(this.state.g4Valve24DripMls),
+                    g5FirstDripMls: parseInt(this.state.g5FirstDripMls),
+                    g5FirstDripEC: parseFloat(this.state.g5FirstDripEC),
+                    g5FirstDripPh: parseFloat(this.state.g5FirstDripPh),
+                    g5FirstDrainMls: parseInt(this.state.g5FirstDrainMls),
+                    g5FirstDrainEc: parseFloat(this.state.g5FirstDrainEc),
+                    g5FirstDrainPh: parseFloat(this.state.g5FirstDrainPh),
+                    g5SecondDripMls: parseInt(this.state.g5SecondDripMls),
+                    g5SecondDripEC: parseFloat(this.state.g5SecondDripEC),
+                    g5SecondDripPh: parseFloat(this.state.g5SecondDripPh),
+                    g5SecondDrainMls: parseInt(this.state.g5SecondDrainMls),
+                    g5SecondDrainEC: parseFloat(this.state.g5SecondDrainEC),
+                    g5SecondDrainPh: parseFloat(this.state.g5SecondDrainPh),
+                    g5Valve25DripMls: parseInt(this.state.g5Valve25DripMls),
+                    g5Valve26DripMls: parseInt(this.state.g5Valve26DripMls),
+                    g5Valve27DripMls: parseInt(this.state.g5Valve27DripMls),
+                    bore1Hours: parseInt(this.state.bore1Hours),
+                    bore1m3: parseInt(this.state.bore1m3),
+                    electricity: parseFloat(this.state.electricity),
+                    Septicm3: parseInt(this.state.Septicm3),
                 },
                 false,
             ).then((result) => {
@@ -4678,7 +5229,7 @@ const styles = StyleSheet.create({
         marginRight: 16,
         backgroundColor: '#F1EFEF',
         borderRadius: 5,
-        
+
 
     },
 

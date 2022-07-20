@@ -10,6 +10,8 @@
     "lint": "eslint ."
   },
   "dependencies": {
+    "@apollo/client": "^3.6.9",
+    "@apollo/react-hooks": "^4.0.0",
     "@react-native-community/async-storage": "^1.12.1",
     "@react-native-community/datetimepicker": "^3.0.9",
     "@react-native-community/masked-view": "^0.1.10",
@@ -17,6 +19,8 @@
     "@react-navigation/native": "^5.9.0",
     "@react-navigation/stack": "^5.13.0",
     "current-week-number": "^1.0.7",
+    "graphql": "^16.5.0",
+    "graphql-tag": "^2.12.6",
     "moment": "^2.29.1",
     "react": "16.13.1",
     "react-native": "0.63.4",

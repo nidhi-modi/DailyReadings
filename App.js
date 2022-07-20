@@ -6,7 +6,7 @@
  * @flow strict-local
  */
 
-import React, { Component } from 'react';
+import React, {Component} from 'react';
 import {
   SafeAreaView,
   StyleSheet,
@@ -24,15 +24,28 @@ import {
   ReloadInstructions,
 } from 'react-native/Libraries/NewAppScreen';
 
-import SplashScreen from 'react-native-splash-screen'
-import MainStackNavigator from './navigation/MainStackNavigator'
+import SplashScreen from 'react-native-splash-screen';
+import MainStackNavigator from './navigation/MainStackNavigator';
 import Realm from 'realm';
-
+import {ApolloClient, InMemoryCache, ApolloProvider} from '@apollo/client';
 
 let realm;
 
-export default class App extends Component {
+//hasura
 
+const Uri = `https://game-flea-26.hasura.app/v1/graphql`;
+const Headers = {
+  'x-hasura-admin-secret':
+    'wFNpG2XoD70lZZqjTjUyhwSxL6LrEZpwaqEqJcP5VpTmb5aaMrPGmCvfqA1sdfm9',
+};
+
+const client = new ApolloClient({
+  uri: Uri,
+  cache: new InMemoryCache(),
+  headers: Headers,
+});
+
+export default class App extends Component {
   constructor(props) {
     super(props);
 
@@ -42,7 +55,7 @@ export default class App extends Component {
         {
           name: 'daily_readings_offline_table',
           properties: {
-            entry_id: { type: 'int', default: 0 },
+            entry_id: {type: 'int', default: 0},
             site_name: 'string',
             currentDate: 'string',
             dateYesterday: 'string',
@@ -147,28 +160,21 @@ export default class App extends Component {
             bore1m3: 'string',
             electricity: 'string',
             Septicm3: 'string',
-
           },
         },
       ],
     });
-
-
-
   }
 
   componentDidMount() {
-
     SplashScreen.hide();
-
   }
 
   render() {
     return (
-
-
-      <MainStackNavigator />
-
+      <ApolloProvider client={client}>
+        <MainStackNavigator />
+      </ApolloProvider>
       /*<>
         <StatusBar barStyle="dark-content" />
         <SafeAreaView>
@@ -254,4 +260,3 @@ const styles = StyleSheet.create({
     textAlign: 'right',
   },
 });
-

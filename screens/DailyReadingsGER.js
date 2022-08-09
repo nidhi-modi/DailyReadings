@@ -2012,7 +2012,7 @@ export default class DailyReadingsGER extends React.Component {
         g3valve15dripmls:
           this.state.g3Valve15DripMls.length === 0
             ? '0'
-            : parseInt(this.state.g3Valve15DripMls),
+            : this.state.g3Valve15DripMls,
         g3valve16dripmls:
           this.state.g3Valve16DripMls.length === 0
             ? '0'
@@ -2084,7 +2084,7 @@ export default class DailyReadingsGER extends React.Component {
         g4valve21dripmls:
           this.state.g4Valve21DripMls.length === 0
             ? '0'
-            : parseInt(this.state.g4Valve21DripMls),
+            : this.state.g4Valve21DripMls,
         g4valve22dripmls:
           this.state.g4Valve22DripMls.length === 0
             ? '0'
@@ -2195,8 +2195,10 @@ export default class DailyReadingsGER extends React.Component {
       AsyncStorage.removeItem('g1NorthDrainPh');
       AsyncStorage.removeItem('g1Valve1DripMls');
       AsyncStorage.removeItem('g1Valve2DripMls');
+      AsyncStorage.removeItem('g1Valve3DripMls');
       AsyncStorage.removeItem('g1Valve4DripMls');
       AsyncStorage.removeItem('g2SouthDripMls');
+      AsyncStorage.removeItem('g2SouthDripEC');
       AsyncStorage.removeItem('g2SouthDripPh');
       AsyncStorage.removeItem('g2SouthDrainMls');
       AsyncStorage.removeItem('g2SouthDrainEc');
@@ -2295,8 +2297,10 @@ export default class DailyReadingsGER extends React.Component {
         g1NorthDrainPh: '',
         g1Valve1DripMls: '',
         g1Valve2DripMls: '',
+        g1Valve3DripMls: '',
         g1Valve4DripMls: '',
         g2SouthDripMls: '',
+        g2SouthDripEC: '',
         g2SouthDripPh: '',
         g2SouthDrainMls: '',
         g2SouthDrainEc: '',

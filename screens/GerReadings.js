@@ -2299,6 +2299,7 @@ const GerReadings = (props) => {
             AsyncStorage.removeItem('g1Valve2DripMls');
             AsyncStorage.removeItem('g1Valve4DripMls');
             AsyncStorage.removeItem('g2SouthDripMls');
+            AsyncStorage.removeItem('g2SouthDripEc');
             AsyncStorage.removeItem('g2SouthDripPh');
             AsyncStorage.removeItem('g2SouthDrainMls');
             AsyncStorage.removeItem('g2SouthDrainEc');

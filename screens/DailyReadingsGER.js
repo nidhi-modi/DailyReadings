@@ -1809,11 +1809,11 @@ export default class DailyReadingsGER extends React.Component {
           this.state.drainDischarge.length === 0
             ? '0'
             : parseInt(this.state.drainDischarge),
-        g1southdrainmls:
+        g1southdripmls:
           this.state.g1SouthDripMls.length === 0
             ? '0'
             : parseInt(this.state.g1SouthDripMls),
-        g1southdrainec:
+        g1southdripec:
           this.state.g1SouthDripEC.length === 0
             ? '0'
             : parseFloat(this.state.g1SouthDripEC),

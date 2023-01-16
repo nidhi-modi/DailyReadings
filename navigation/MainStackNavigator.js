@@ -20,6 +20,7 @@ import DailyReadingsGER from '../screens/DailyReadingsGER';
 import GerReadings from '../screens/GerReadings';
 import GetAwsData from '../screens/GetAwsData';
 import SendDataToAws from '../screens/SendDataToAws';
+import DailyReadingsHAR from '../screens/DailyReadingsHAR';
 
 const Stack = createStackNavigator();
 
@@ -96,6 +97,28 @@ function MainStackNavigator() {
                 <Text style={styles.headerLeftTopStyle}></Text>
 
                 <Text style={styles.headerRightStyle}>GER</Text>
+              </View>
+            ),
+            title: null,
+          }}
+        />
+
+        <Stack.Screen
+          name="DailyReadingsHAR"
+          component={DailyReadingsHAR}
+          options={{
+            headerLeft: () => (
+              <View style={styles.alignTextView}>
+                <Text style={styles.headerLeftTopStyle}>Daily Readings</Text>
+
+                <Text style={styles.headerLeftStyle}>Add Entry</Text>
+              </View>
+            ),
+            headerRight: () => (
+              <View style={styles.alignTextView}>
+                <Text style={styles.headerLeftTopStyle}></Text>
+
+                <Text style={styles.headerRightStyle}>HAR</Text>
               </View>
             ),
             title: null,
